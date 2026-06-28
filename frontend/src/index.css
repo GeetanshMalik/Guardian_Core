@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-apple-blue: var(--apple-blue);
+  --color-apple-blue-focus: var(--apple-blue-focus);
+  --color-apple-blue-on-dark: var(--apple-blue-on-dark);
+  --color-apple-ink: var(--apple-ink);
+  --color-apple-body: var(--apple-body);
+  --color-apple-body-on-dark: var(--apple-body-on-dark);
+  --color-apple-body-muted: var(--apple-body-muted);
+  --color-apple-ink-muted-80: var(--apple-ink-muted-80);
+  --color-apple-ink-muted-48: var(--apple-ink-muted-48);
+  --color-apple-divider-soft: var(--apple-divider-soft);
+  --color-apple-hairline: var(--apple-hairline);
+  --color-apple-canvas: var(--apple-canvas);
+  --color-apple-canvas-parchment: var(--apple-canvas-parchment);
+  --color-apple-surface-pearl: var(--apple-surface-pearl);
+  --color-apple-surface-tile-1: var(--apple-surface-tile-1);
+  --color-apple-surface-tile-2: var(--apple-surface-tile-2);
+  --color-apple-surface-tile-3: var(--apple-surface-tile-3);
+  --color-apple-surface-black: var(--apple-surface-black);
+
+  --shadow-apple-product: 0 5px 30px rgba(0, 0, 0, 0.22);
+}
+
+:root {
+  --apple-blue: #0066cc;
+  --apple-blue-focus: #0071e3;
+  --apple-blue-on-dark: #2997ff;
+  --apple-ink: #1d1d1f;
+  --apple-body: #1d1d1f;
+  --apple-body-on-dark: #ffffff;
+  --apple-body-muted: #86868b;
+  --apple-ink-muted-80: #333333;
+  --apple-ink-muted-48: #7a7a7a;
+  --apple-divider-soft: #f0f0f0;
+  --apple-hairline: #e0e0e0;
+  --apple-canvas: #ffffff;
+  --apple-canvas-parchment: #f5f5f7;
+  --apple-surface-pearl: #fafafc;
+  --apple-surface-tile-1: #272729;
+  --apple-surface-tile-2: #2a2a2c;
+  --apple-surface-tile-3: #252527;
+  --apple-surface-black: #000000;
+}
+
+.dark, :root.dark {
+  --apple-blue: #2997ff;
+  --apple-blue-focus: #54aeff;
+  --apple-blue-on-dark: #2997ff;
+  --apple-ink: #f5f5f7;
+  --apple-body: #e3e3e7;
+  --apple-body-on-dark: #ffffff;
+  --apple-body-muted: #a1a1a6;
+  --apple-ink-muted-80: #e0e0e0;
+  --apple-ink-muted-48: #86868b;
+  --apple-divider-soft: #2c2c2e;
+  --apple-hairline: #2c2c2e;
+  --apple-canvas: #1c1c1e;
+  --apple-canvas-parchment: #121214;
+  --apple-surface-pearl: #1c1c1e;
+  --apple-surface-tile-1: #272729;
+  --apple-surface-tile-2: #2a2a2c;
+  --apple-surface-tile-3: #252527;
+  --apple-surface-black: #000000;
+}
+
+body {
+  background-color: var(--apple-canvas-parchment);
+  color: var(--apple-body);
+}
+
+/* Dark mode overrides for common Tailwind utilities */
+.dark body {
+  background-color: var(--apple-canvas-parchment) !important;
+  color: var(--apple-body) !important;
+}
+
+.dark nav {
+  background-color: rgba(29, 29, 31, 0.95) !important;
+  border-color: var(--apple-hairline) !important;
+}
+
+.dark .bg-white {
+  background-color: var(--apple-canvas) !important;
+}
+
+.dark .bg-apple-canvas-parchment {
+  background-color: var(--apple-canvas-parchment) !important;
+}
+
+.dark .bg-apple-surface-pearl {
+  background-color: var(--apple-surface-pearl) !important;
+}
+
+.dark .border-apple-hairline {
+  border-color: var(--apple-hairline) !important;
+}
+
+.dark .text-apple-ink {
+  color: var(--apple-ink) !important;
+}
+
+.dark .text-gray-900 {
+  color: var(--apple-ink) !important;
+}
+
+.dark .text-gray-500 {
+  color: var(--apple-body-muted) !important;
+}
+
+.dark .text-gray-600 {
+  color: var(--apple-body-muted) !important;
+}
+
+.dark .text-gray-400 {
+  color: #8e8e93 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: var(--apple-hairline) !important;
+}
+
+.dark .border-apple-hairline\/80 {
+  border-color: rgba(44, 44, 46, 0.8) !important;
+}
+
+.dark .border-apple-hairline\/60 {
+  border-color: rgba(44, 44, 46, 0.6) !important;
+}
+
+.dark .border-apple-hairline\/50 {
+  border-color: rgba(44, 44, 46, 0.5) !important;
+}
+
+.dark .border-apple-hairline\/40 {
+  border-color: rgba(44, 44, 46, 0.4) !important;
+}
+
+.dark .border-apple-hairline\/15 {
+  border-color: rgba(44, 44, 46, 0.15) !important;
+}
+
+.dark .bg-apple-canvas-parchment\/60 {
+  background-color: rgba(28, 28, 30, 0.6) !important;
+}
+
+.dark .bg-apple-canvas-parchment\/40 {
+  background-color: rgba(28, 28, 30, 0.4) !important;
+}
+
+.dark .bg-apple-canvas-parchment\/10 {
+  background-color: rgba(28, 28, 30, 0.1) !important;
+}
+
+.dark .bg-apple-surface-pearl\/40 {
+  background-color: rgba(28, 28, 30, 0.4) !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .hover\:bg-apple-surface-pearl:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .hover\:bg-apple-surface-pearl\/40:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Custom transitions and scrollbars for professional feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d2d2d7;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a6;
+}

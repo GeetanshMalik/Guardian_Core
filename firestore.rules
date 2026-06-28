@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper to check if request is for the owner
+    function isOwner(userId) {
+      return isAuthenticated() && (request.auth.uid == userId || request.auth.token.email == userId);
+    }
+
+    // Helper to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'admin';
+    }
+
+    // Goals collection rules
+    match /goals/{goalId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+
+    // Milestones and Tasks
+    match /milestones/{milestoneId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /tasks/{taskId} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+
+    // Memories collections
+    match /preferenceMemories/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /episodicMemories/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /semanticMemories/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /decisionMemories/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /reflectionMemories/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+    match /observations/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+
+    // Notifications
+    match /notifications/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+
+    // Tool registry & execution logs
+    match /toolRegistry/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    match /toolExecutionLogs/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+
+    // Audit logs - Admin only or create-only for authenticated
+    match /auditLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+    }
+
+    // Background jobs
+    match /jobs/{id} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Dead letter queue & event archival (Admin only)
+    match /deadLetterEvents/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /processedEvents/{id} {
+      allow read, write: if isAuthenticated();
+    }
+    match /eventStore/{id} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+    }
+    match /apiIdempotency/{id} {
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.token.email || isAdmin());
+    }
+  }
+}

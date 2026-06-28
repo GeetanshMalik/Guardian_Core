@@ -1,0 +1,65 @@
+[
+  {
+    "id": "mock-g1",
+    "title": "Train to RA",
+    "description": "Travel to Rajasthan",
+    "date": "2026-06-13",
+    "startTime": "08:00",
+    "endTime": "12:00",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g2",
+    "title": "Geetansh",
+    "description": "Personal sync",
+    "date": "2026-06-16",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g3",
+    "title": "Happy birthday 🎂",
+    "description": "Friend's birthday celebration",
+    "date": "2026-06-18",
+    "startTime": "09:00",
+    "endTime": "18:00",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g4",
+    "title": "Geetansh",
+    "description": "Catch up session",
+    "date": "2026-06-19",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g5",
+    "title": "Geetansh",
+    "description": "Co pair programming",
+    "date": "2026-06-23",
+    "startTime": "11:00",
+    "endTime": "12:30",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g6",
+    "title": "Muharram 🟢",
+    "description": "Holiday",
+    "date": "2026-06-26",
+    "startTime": "00:00",
+    "endTime": "23:59",
+    "isGoogleEvent": true
+  },
+  {
+    "id": "mock-g7",
+    "title": "Train to BH",
+    "description": "Travel back",
+    "date": "2026-06-30",
+    "startTime": "17:00",
+    "endTime": "21:00",
+    "isGoogleEvent": true
+  }
+]

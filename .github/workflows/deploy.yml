@@ -1,0 +1,159 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ─── Quality Gates: Lint, Build, and Test ─────────────────────────────
+  test:
+    name: Run Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-size: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Code Linting
+        run: npm run lint
+
+      - name: Build Bundles
+        run: npm run build
+
+      - name: Run Test Suites
+        run: npm run test
+
+  # ─── Deployment to Staging Environment ────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: staging
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          # Supports both Workload Identity Federation (recommended) and Service Account Keys
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for GCP Registry
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_TAG=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
+          docker build -t $IMAGE_TAG .
+          docker push $IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Deploy API Service to Cloud Run (Staging)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: guardian-core-api-staging
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
+          region: ${{ secrets.GCP_REGION }}
+          env_vars: |
+            NODE_ENV=production
+            DISABLE_WORKERS=true
+            ENABLE_SECRET_MANAGER=true
+            ENABLE_FIRESTORE=true
+            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy Background Worker Service to Cloud Run (Staging)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: guardian-core-worker-staging
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
+          region: ${{ secrets.GCP_REGION }}
+          env_vars: |
+            NODE_ENV=production
+            DISABLE_WORKERS=false
+            ENABLE_SECRET_MANAGER=true
+            ENABLE_FIRESTORE=true
+            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Run Smoke Tests
+        run: |
+          STAGING_URL=$(gcloud run services describe guardian-core-api-staging --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
+          echo "Staging API URL: $STAGING_URL"
+          curl -f -s "$STAGING_URL/health" || (echo "Staging health check failed!" && exit 1)
+
+  # ─── Deployment to Production Environment ─────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    # Requires manual environment approval gating in GitHub UI
+    environment: production
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy API Service to Cloud Run (Production)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: guardian-core-api-prod
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
+          region: ${{ secrets.GCP_REGION }}
+          # Zero-Downtime Blue-Green rollout config
+          no_traffic: false
+          env_vars: |
+            NODE_ENV=production
+            DISABLE_WORKERS=true
+            ENABLE_SECRET_MANAGER=true
+            ENABLE_FIRESTORE=true
+            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy Worker Service to Cloud Run (Production)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: guardian-core-worker-prod
+          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
+          region: ${{ secrets.GCP_REGION }}
+          env_vars: |
+            NODE_ENV=production
+            DISABLE_WORKERS=false
+            ENABLE_SECRET_MANAGER=true
+            ENABLE_FIRESTORE=true
+            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}

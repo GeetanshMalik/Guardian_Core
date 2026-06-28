@@ -1,0 +1,6 @@
+{
+  "name": "Deadline Guardian AI",
+  "description": "An AI-powered Goal Execution System that analyzes goal feasibility, maps dependencies, schedules work, and assists with real-time task execution and recovery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

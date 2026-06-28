@@ -1,0 +1,134 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Deadline Guardian AI API Gateway Specification",
+    "description": "API contract for the Deadline Guardian AI cognitive platform. Exposes REST and WebSocket endpoints for goal, memory, research, and calendar orchestration.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Version 1 API Endpoint"
+    }
+  ],
+  "paths": {
+    "/conversations/message": {
+      "post": {
+        "summary": "Submit a conversational message",
+        "description": "Processes natural language requests through the Roundtable cognitive pipeline.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" },
+                  "goalId": { "type": "string" },
+                  "conversationId": { "type": "string" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with responseMessage and updatedGoal"
+          }
+        }
+      }
+    },
+    "/goals": {
+      "get": {
+        "summary": "Retrieve all goals",
+        "responses": {
+          "200": {
+            "description": "List of goals"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new goal",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "deadline": { "type": "string" },
+                  "context": { "type": "string" }
+                },
+                "required": ["title", "deadline"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created goal with decomposed plan"
+          }
+        }
+      }
+    },
+    "/goals/{id}": {
+      "get": {
+        "summary": "Retrieve specific goal details"
+      },
+      "delete": {
+        "summary": "Delete specific goal"
+      }
+    },
+    "/worker/status": {
+      "get": {
+        "summary": "Retrieve background worker health metrics",
+        "responses": {
+          "200": {
+            "description": "Live health metrics for all 10 workers"
+          }
+        }
+      }
+    },
+    "/worker/{name}/trigger": {
+      "post": {
+        "summary": "Manually trigger worker execution",
+        "responses": {
+          "200": {
+            "description": "Worker execution scheduled successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

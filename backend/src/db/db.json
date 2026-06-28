@@ -1,0 +1,1604 @@
+{
+  "goals": [
+    {
+      "id": "g-13101915-",
+      "createdAt": "2026-06-27T19:13:25.825Z",
+      "context": "Remind me in the morning.",
+      "clarification": {
+        "answers": {},
+        "questions": []
+      },
+      "deadline": "2026-06-30",
+      "title": "Train journey",
+      "analysis": {
+        "complexity": "Medium",
+        "risks": [
+          "No significant risks detected with current timeline"
+        ],
+        "feasibilityScore": 65,
+        "deadlineFormatted": "Tuesday, June 30, 2026",
+        "riskScore": 35,
+        "explanation": "Deterministic plan generated using \"generic\" template with 5 tasks across 3 milestones. No AI calls were needed for this goal type.",
+        "constraints": [
+          "3 days available until deadline"
+        ],
+        "dependencies": [
+          "Define scope, gather resources, and establish milestones.",
+          "Complete the primary work required for this goal."
+        ]
+      },
+      "plan": {
+        "schedule": [
+          {
+            "id": "s-t1",
+            "taskId": "t1",
+            "title": "Work Block: Initial Setup",
+            "date": "2026-06-27",
+            "startTime": "09:00",
+            "endTime": "10:00",
+            "isSynced": true
+          },
+          {
+            "id": "s-t2",
+            "taskId": "t2",
+            "title": "Work Block: Define Action Plan",
+            "date": "2026-06-27",
+            "startTime": "09:00",
+            "endTime": "10:00",
+            "isSynced": true
+          },
+          {
+            "id": "s-t3",
+            "taskId": "t3",
+            "title": "Work Block: Execute Primary Work",
+            "date": "2026-06-28",
+            "startTime": "09:00",
+            "endTime": "11:00",
+            "isSynced": true
+          },
+          {
+            "id": "s-t4",
+            "taskId": "t4",
+            "title": "Work Block: Review & Polish",
+            "date": "2026-06-29",
+            "startTime": "09:00",
+            "endTime": "10:00",
+            "isSynced": true
+          },
+          {
+            "id": "s-t5",
+            "taskId": "t5",
+            "title": "Work Block: Finalize & Close",
+            "date": "2026-06-29",
+            "startTime": "09:00",
+            "endTime": "10:00",
+            "isSynced": true
+          }
+        ],
+        "milestones": [
+          {
+            "id": "m1",
+            "title": "Kickoff & Planning",
+            "description": "Define scope, gather resources, and establish milestones.",
+            "estimatedMinutes": 60,
+            "dependencies": [],
+            "targetDate": "2026-06-27",
+            "completionCriteria": "Scope defined and resources identified",
+            "status": "pending",
+            "riskLevel": "Low"
+          },
+          {
+            "id": "m2",
+            "title": "Core Execution",
+            "description": "Complete the primary work required for this goal.",
+            "estimatedMinutes": 120,
+            "dependencies": [
+              "m1"
+            ],
+            "targetDate": "2026-06-28",
+            "completionCriteria": "Primary deliverables completed",
+            "status": "pending",
+            "riskLevel": "Low"
+          },
+          {
+            "id": "m3",
+            "title": "Review & Finalization",
+            "description": "Review work quality and finalize deliverables.",
+            "estimatedMinutes": 60,
+            "dependencies": [
+              "m2"
+            ],
+            "targetDate": "2026-06-29",
+            "completionCriteria": "All work reviewed and finalized",
+            "status": "pending",
+            "riskLevel": "Low"
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "title": "Initial Setup",
+            "description": "Prepare workspace and gather all necessary materials.",
+            "estimatedMinutes": 30,
+            "dayNumber": 1,
+            "isCompleted": false,
+            "completedAt": null,
+            "aiAssistance": null,
+            "priority": "Medium",
+            "relatedMilestoneId": "m1"
+          },
+          {
+            "id": "t2",
+            "title": "Define Action Plan",
+            "description": "Break down the goal into concrete steps.",
+            "estimatedMinutes": 30,
+            "dayNumber": 1,
+            "isCompleted": false,
+            "completedAt": null,
+            "aiAssistance": null,
+            "priority": "Medium",
+            "relatedMilestoneId": "m1"
+          },
+          {
+            "id": "t3",
+            "title": "Execute Primary Work",
+            "description": "Complete the main deliverable for this goal.",
+            "estimatedMinutes": 90,
+            "dayNumber": 2,
+            "isCompleted": false,
+            "completedAt": null,
+            "aiAssistance": null,
+            "priority": "High",
+            "relatedMilestoneId": "m2"
+          },
+          {
+            "id": "t4",
+            "title": "Review & Polish",
+            "description": "Review completed work and make refinements.",
+            "estimatedMinutes": 45,
+            "dayNumber": 3,
+            "isCompleted": false,
+            "completedAt": null,
+            "aiAssistance": null,
+            "priority": "Medium",
+            "relatedMilestoneId": "m3"
+          },
+          {
+            "id": "t5",
+            "title": "Finalize & Close",
+            "description": "Final checks and mark goal as ready.",
+            "estimatedMinutes": 30,
+            "dayNumber": 3,
+            "isCompleted": false,
+            "completedAt": null,
+            "aiAssistance": null,
+            "priority": "Medium",
+            "relatedMilestoneId": "m3"
+          }
+        ]
+      },
+      "status": "active"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-risk-61af719e",
+      "type": "rescue",
+      "title": "Alert: Elevated Risk for \"Train journey\"",
+      "message": "Our Sentinel Agent detected progress lag (Procrastination index: 95%). An adaptive rescue/recovery roadmap has been drafted for your activation.",
+      "goalId": "g-13101915-",
+      "createdAt": "2026-06-28T20:13:30.522Z",
+      "isRead": false
+    },
+    {
+      "id": "n-init",
+      "type": "success",
+      "title": "Guardian Sentinel Online",
+      "message": "The Guardian Core agent-mesh is fully synchronized and actively monitoring your roadmap.",
+      "createdAt": "2026-06-27T17:22:02.984Z",
+      "isRead": false
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-f811ebee",
+      "workerName": "Research Refresh Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Research Refresh Worker.",
+      "createdAt": "2026-06-28T20:13:53.431Z"
+    },
+    {
+      "id": "job-a6e14d5f",
+      "workerName": "Reflection Worker",
+      "type": "EVENT_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 2943ms. Attempts: 1.",
+      "createdAt": "2026-06-28T20:13:41.242Z"
+    },
+    {
+      "id": "job-f8a129c4",
+      "workerName": "Learning Worker",
+      "type": "EVENT_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Learning Worker.",
+      "createdAt": "2026-06-28T20:13:23.289Z"
+    },
+    {
+      "id": "job-1258e2da",
+      "workerName": "Daily Brief Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 3332ms. Attempts: 1.",
+      "createdAt": "2026-06-28T20:13:11.619Z"
+    },
+    {
+      "id": "job-3a1ab75a",
+      "workerName": "Deadline Monitoring Worker",
+      "type": "MONITORING_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Deadline Monitoring Worker.",
+      "createdAt": "2026-06-28T20:13:08.299Z"
+    },
+    {
+      "id": "job-c7dc9676",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 3457ms. Attempts: 1.",
+      "createdAt": "2026-06-27T19:13:31.901Z"
+    },
+    {
+      "id": "job-4f198d2a",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 3049ms. Attempts: 1.",
+      "createdAt": "2026-06-27T19:12:29.925Z"
+    },
+    {
+      "id": "job-c638993f",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Reminder Worker.",
+      "createdAt": "2026-06-27T19:12:26.894Z"
+    },
+    {
+      "id": "job-4f198d2a",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Notification Worker.",
+      "createdAt": "2026-06-27T19:12:26.876Z"
+    },
+    {
+      "id": "job-43a8d2fb",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 2231ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:37:36.934Z"
+    },
+    {
+      "id": "job-0fef67a0",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 433295ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:37:36.718Z"
+    },
+    {
+      "id": "job-942364f2",
+      "workerName": "Calendar Synchronization Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 433254ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:37:36.675Z"
+    },
+    {
+      "id": "job-36e35726",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Reminder Worker.",
+      "createdAt": "2026-06-27T18:37:34.705Z"
+    },
+    {
+      "id": "job-2d51f176",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Reminder Worker.",
+      "createdAt": "2026-06-27T18:30:23.425Z"
+    },
+    {
+      "id": "job-b2ceee4b",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1677ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:15:54.850Z"
+    },
+    {
+      "id": "job-9738f58b",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1708ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:10:54.748Z"
+    },
+    {
+      "id": "job-865707e8",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Reminder Worker.",
+      "createdAt": "2026-06-27T18:09:22.976Z"
+    },
+    {
+      "id": "job-e28fe43a",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1680ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:05:54.569Z"
+    },
+    {
+      "id": "job-b3a5192c",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1668ms. Attempts: 1.",
+      "createdAt": "2026-06-27T18:00:54.394Z"
+    },
+    {
+      "id": "job-a24c26ce",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1967ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:55:54.536Z"
+    },
+    {
+      "id": "job-05d3d816",
+      "workerName": "Calendar Synchronization Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Calendar Synchronization Worker.",
+      "createdAt": "2026-06-27T17:55:07.549Z"
+    },
+    {
+      "id": "job-3ec51856",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1907ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:40:53.997Z"
+    },
+    {
+      "id": "job-302eb361",
+      "workerName": "Reminder Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Reminder Worker.",
+      "createdAt": "2026-06-27T17:37:21.983Z"
+    },
+    {
+      "id": "job-c4a28133",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1838ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:35:53.771Z"
+    },
+    {
+      "id": "job-b6c91c5f",
+      "workerName": "Analytics Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 1876ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:26:08.526Z"
+    },
+    {
+      "id": "job-a400b274",
+      "workerName": "Memory Consolidation Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 24452ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:26:01.082Z"
+    },
+    {
+      "id": "job-48266b87",
+      "workerName": "Notification Worker",
+      "type": "MONITORING_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 2022ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:25:53.665Z"
+    },
+    {
+      "id": "job-23cda2bb",
+      "workerName": "Research Refresh Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Research Refresh Worker.",
+      "createdAt": "2026-06-27T17:25:36.631Z"
+    },
+    {
+      "id": "job-8a2e692f",
+      "workerName": "Learning Worker",
+      "type": "EVENT_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 25111ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:25:31.718Z"
+    },
+    {
+      "id": "job-8a2e692f",
+      "workerName": "Learning Worker",
+      "type": "EVENT_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Learning Worker.",
+      "createdAt": "2026-06-27T17:25:06.607Z"
+    },
+    {
+      "id": "job-515f8f12",
+      "workerName": "Daily Brief Worker",
+      "type": "SCHEDULED_JOB",
+      "status": "completed",
+      "message": "Completed successfully. Duration: 3297ms. Attempts: 1.",
+      "createdAt": "2026-06-27T17:24:54.903Z"
+    },
+    {
+      "id": "job-b595811f",
+      "workerName": "Deadline Monitoring Worker",
+      "type": "MONITORING_JOB",
+      "status": "processing",
+      "message": "Initiating execution loop for Deadline Monitoring Worker.",
+      "createdAt": "2026-06-27T17:24:51.614Z"
+    }
+  ],
+  "episodicMemories": [],
+  "semanticMemories": [],
+  "preferenceMemories": [
+    {
+      "id": "pref-53642e61",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 3 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:53.084Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-88daecf9",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:51.564Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-d98e6e3d",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:50.045Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-fac588bd",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 6 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:48.528Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-33a61527",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:47.021Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-9bd059a2",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:45.511Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-5198f897",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:43.992Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-45341ed2",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 6 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:42.472Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-85e04626",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 5 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:40.964Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-d478d508",
+      "preferenceKey": "ToolExecutionFramework:tool_execution_success",
+      "value": "Modified 3 resources. Correlation ID: sync-i1e1d4uml",
+      "confidence": 95,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:39.452Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-1f5cdce2",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:37.935Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-aa94db05",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:36.418Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-6b07146a",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:34.909Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-caa7c042",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:33.399Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-12d8592c",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:31.887Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-b298187c",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:30.375Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-23d238da",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 6 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-28T20:13:28.861Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-44522968",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:30.210Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-8b9ff5f8",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:28.702Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-cf3251af",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:27.194Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-aeb459df",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:25.683Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-d03e6c31",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:22.658Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-002d635c",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:21.150Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-695a5925",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 6 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:19.636Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-6ca4bb7b",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:18.130Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-3ca6c345",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:16.617Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-5f8ae044",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:15.099Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-69144858",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:13.587Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-4fff3907",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 0 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:12.077Z",
+      "version": 1,
+      "status": "promoted"
+    },
+    {
+      "id": "pref-9dc8b423",
+      "preferenceKey": "CognitiveEngine:goal_planning_cycle",
+      "value": "Successfully built execution plan with 6 tasks and scheduling configuration.",
+      "confidence": 100,
+      "evidenceCount": 1,
+      "source": "System",
+      "lastUpdated": "2026-06-27T17:25:10.565Z",
+      "version": 1,
+      "status": "promoted"
+    }
+  ],
+  "decisionMemories": [
+    {
+      "id": "dec-292ixo9wy",
+      "decisionId": "policy-dec-jbjp3cfjh",
+      "context": "Policy Evaluation: calendar_sync",
+      "alternativesConsidered": [
+        "Deny vs Authorize in assisted mode"
+      ],
+      "selectedOutcome": "pending_approval",
+      "supportingEvidence": [
+        "Action: calendar_sync",
+        "Autonomy Level: assisted",
+        "Risk Score: 35%",
+        "Engine Confidence: 95%"
+      ],
+      "confidence": 95,
+      "userOverrideStatus": "none",
+      "timestamp": "2026-06-28T20:13:32.169Z"
+    }
+  ],
+  "reflectionMemories": [],
+  "observations": [],
+  "autonomyLevel": "assisted",
+  "toolRegistry": [
+    {
+      "id": "google_calendar",
+      "name": "Google Calendar",
+      "operations": [
+        "create_event",
+        "update_event",
+        "delete_event",
+        "list_events"
+      ],
+      "requiredScopes": [
+        "https://www.googleapis.com/auth/calendar.events"
+      ],
+      "availabilityStatus": "active",
+      "healthStatus": "healthy",
+      "retryPolicy": {
+        "maxRetries": 3,
+        "initialDelayMs": 1000
+      },
+      "timeoutMs": 10000,
+      "rollbackSupported": true
+    },
+    {
+      "id": "gmail",
+      "name": "Gmail Integration",
+      "operations": [
+        "create_draft",
+        "send_email"
+      ],
+      "requiredScopes": [
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/gmail.compose"
+      ],
+      "availabilityStatus": "active",
+      "healthStatus": "healthy",
+      "retryPolicy": {
+        "maxRetries": 3,
+        "initialDelayMs": 1000
+      },
+      "timeoutMs": 10000,
+      "rollbackSupported": false
+    }
+  ],
+  "toolExecutionLogs": [
+    {
+      "id": "op-1arj877v1",
+      "request": {
+        "toolId": "google_calendar",
+        "operation": "sync_sessions",
+        "parameters": {
+          "sessionIds": [
+            "s-t1",
+            "s-t2",
+            "s-t3",
+            "s-t4",
+            "s-t5"
+          ],
+          "schedule": [
+            {
+              "id": "s-t1",
+              "taskId": "t1",
+              "title": "Work Block: Initial Setup",
+              "date": "2026-06-27",
+              "startTime": "09:00",
+              "endTime": "10:00",
+              "isSynced": true
+            },
+            {
+              "id": "s-t2",
+              "taskId": "t2",
+              "title": "Work Block: Define Action Plan",
+              "date": "2026-06-27",
+              "startTime": "09:00",
+              "endTime": "10:00",
+              "isSynced": true
+            },
+            {
+              "id": "s-t3",
+              "taskId": "t3",
+              "title": "Work Block: Execute Primary Work",
+              "date": "2026-06-28",
+              "startTime": "09:00",
+              "endTime": "11:00",
+              "isSynced": true
+            },
+            {
+              "id": "s-t4",
+              "taskId": "t4",
+              "title": "Work Block: Review & Polish",
+              "date": "2026-06-29",
+              "startTime": "09:00",
+              "endTime": "10:00",
+              "isSynced": true
+            },
+            {
+              "id": "s-t5",
+              "taskId": "t5",
+              "title": "Work Block: Finalize & Close",
+              "date": "2026-06-29",
+              "startTime": "09:00",
+              "endTime": "10:00",
+              "isSynced": true
+            }
+          ],
+          "tasks": [
+            {
+              "id": "t1",
+              "title": "Initial Setup",
+              "description": "Prepare workspace and gather all necessary materials.",
+              "estimatedMinutes": 30,
+              "dayNumber": 1,
+              "isCompleted": false,
+              "completedAt": null,
+              "aiAssistance": null,
+              "priority": "Medium",
+              "relatedMilestoneId": "m1"
+            },
+            {
+              "id": "t2",
+              "title": "Define Action Plan",
+              "description": "Break down the goal into concrete steps.",
+              "estimatedMinutes": 30,
+              "dayNumber": 1,
+              "isCompleted": false,
+              "completedAt": null,
+              "aiAssistance": null,
+              "priority": "Medium",
+              "relatedMilestoneId": "m1"
+            },
+            {
+              "id": "t3",
+              "title": "Execute Primary Work",
+              "description": "Complete the main deliverable for this goal.",
+              "estimatedMinutes": 90,
+              "dayNumber": 2,
+              "isCompleted": false,
+              "completedAt": null,
+              "aiAssistance": null,
+              "priority": "High",
+              "relatedMilestoneId": "m2"
+            },
+            {
+              "id": "t4",
+              "title": "Review & Polish",
+              "description": "Review completed work and make refinements.",
+              "estimatedMinutes": 45,
+              "dayNumber": 3,
+              "isCompleted": false,
+              "completedAt": null,
+              "aiAssistance": null,
+              "priority": "Medium",
+              "relatedMilestoneId": "m3"
+            },
+            {
+              "id": "t5",
+              "title": "Finalize & Close",
+              "description": "Final checks and mark goal as ready.",
+              "estimatedMinutes": 30,
+              "dayNumber": 3,
+              "isCompleted": false,
+              "completedAt": null,
+              "aiAssistance": null,
+              "priority": "Medium",
+              "relatedMilestoneId": "m3"
+            }
+          ],
+          "goalTitle": "Train journey",
+          "goalId": "g-13101915-"
+        },
+        "decisionId": "g-13101915-",
+        "userId": "current-user",
+        "correlationId": "sync-asa96018g",
+        "requiredPermission": "https://www.googleapis.com/auth/calendar.events"
+      },
+      "result": {
+        "success": false,
+        "operationId": "op-1arj877v1",
+        "timestamp": "2026-06-28T20:13:25.726Z",
+        "modifiedResources": [],
+        "metadata": {
+          "durationMs": 21522,
+          "attempts": 1,
+          "error": "Operation timed out after 10000ms"
+        },
+        "validationResult": {
+          "passed": false,
+          "reason": "Action queued. Human review is required because the system is operating in assisted mode and risk level is evaluated as normal."
+        }
+      },
+      "timestamp": "2026-06-28T20:13:47.248Z",
+      "status": "failed"
+    }
+  ],
+  "researchPackages": [],
+  "milestones": [
+    {
+      "id": "m3",
+      "title": "Review & Finalization",
+      "description": "Review work quality and finalize deliverables.",
+      "estimatedMinutes": 60,
+      "dependencies": [
+        "m2"
+      ],
+      "targetDate": "2026-06-29",
+      "completionCriteria": "All work reviewed and finalized",
+      "status": "pending",
+      "riskLevel": "Low",
+      "goalId": "g-13101915-"
+    },
+    {
+      "id": "m2",
+      "title": "Core Execution",
+      "description": "Complete the primary work required for this goal.",
+      "estimatedMinutes": 120,
+      "dependencies": [
+        "m1"
+      ],
+      "targetDate": "2026-06-28",
+      "completionCriteria": "Primary deliverables completed",
+      "status": "pending",
+      "riskLevel": "Low",
+      "goalId": "g-13101915-"
+    },
+    {
+      "id": "m1",
+      "title": "Kickoff & Planning",
+      "description": "Define scope, gather resources, and establish milestones.",
+      "estimatedMinutes": 60,
+      "dependencies": [],
+      "targetDate": "2026-06-27",
+      "completionCriteria": "Scope defined and resources identified",
+      "status": "pending",
+      "riskLevel": "Low",
+      "goalId": "g-13101915-"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t5",
+      "title": "Finalize & Close",
+      "description": "Final checks and mark goal as ready.",
+      "estimatedMinutes": 30,
+      "dayNumber": 3,
+      "isCompleted": false,
+      "completedAt": null,
+      "aiAssistance": null,
+      "priority": "Medium",
+      "relatedMilestoneId": "m3",
+      "goalId": "g-13101915-"
+    },
+    {
+      "id": "t4",
+      "title": "Review & Polish",
+      "description": "Review completed work and make refinements.",
+      "estimatedMinutes": 45,
+      "dayNumber": 3,
+      "isCompleted": false,
+      "completedAt": null,
+      "aiAssistance": null,
+      "priority": "Medium",
+      "relatedMilestoneId": "m3",
+      "goalId": "g-13101915-"
+    },
+    {
+      "id": "t3",
+      "title": "Execute Primary Work",
+      "description": "Complete the main deliverable for this goal.",
+      "estimatedMinutes": 90,
+      "dayNumber": 2,
+      "isCompleted": false,
+      "completedAt": null,
+      "aiAssistance": null,
+      "priority": "High",
+      "relatedMilestoneId": "m2",
+      "goalId": "g-13101915-"
+    },
+    {
+      "id": "t1",
+      "title": "Initial Setup",
+      "description": "Prepare workspace and gather all necessary materials.",
+      "estimatedMinutes": 30,
+      "dayNumber": 1,
+      "isCompleted": false,
+      "completedAt": null,
+      "aiAssistance": null,
+      "priority": "Medium",
+      "relatedMilestoneId": "m1",
+      "goalId": "g-13101915-"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "audit-05d25223-3894-4317-bb76-2e440884b3c0",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-28T20:13:20.677Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "73098cc7-10f7-441e-be2d-2de9650bb2a1",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-ce49049e-e066-41b7-92b0-eaf5d669e475",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-28T20:13:20.670Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "dc415331-5805-4c56-b02b-d1418a17cab6",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-c533cdcf-3407-480f-b7eb-9946a28af8c0",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-28T20:13:20.653Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "c82c6db1-191e-4aca-bdf5-9facd516090d",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-3e6821a8-9f43-4434-a6db-22600b1949ef",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T19:12:33.371Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "fe0a885c-33c7-442b-8131-004c8e3f8d97",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-21975792-635e-497a-8bc4-569145851de4",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T19:12:33.298Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "8732c26b-af62-4628-a959-7b9bccd0fa6f",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-cd809377-172f-4254-a0df-105a3b54f811",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T19:12:29.512Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "6025f25e-2030-440f-9e5f-7d5978ac1723",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-f3b6f8a8-f3a4-4574-aa11-916142efbc68",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T19:12:29.483Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "0f5ac6ab-afbb-4114-b611-1a93755c57b4",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-28fddbb5-179e-4637-add1-9f32fe06c87a",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/notifications",
+      "timestamp": "2026-06-27T19:12:28.399Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "7e1e68bd-35c6-46b2-93e1-7c52e54e6cdd",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-6fd7ddc9-8c88-4714-a351-7d99cd855cbd",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/notifications",
+      "timestamp": "2026-06-27T18:42:23.500Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "fecfb02d-543a-490b-be2a-dec87d285051",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-8d93a98c-3307-46d3-9a1c-2382529ed861",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:42:08.497Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "8ece966e-f19b-415a-b952-23016f6d71b5",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-8dbcea51-ed8e-4ffc-a34b-41537348697e",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/notifications",
+      "timestamp": "2026-06-27T18:41:53.498Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "385048b2-c520-43c7-a2f6-bb700252fc27",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-d71252e9-8e07-43d8-947c-192de493e92f",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:41:38.503Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "26eb8fd0-20b7-48f1-8009-5f03ed1a1f2f",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-9a730746-05bc-4c98-9770-7ddcf5fcb822",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:41:23.501Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "211a25aa-a957-4492-a7ad-435383c9ac21",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-7f283a5e-c22f-41b1-bd65-f7d957a5015b",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:41:08.509Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "f8742b33-8a9f-403f-b632-0314a8385822",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-063158b9-fcf6-4edd-b882-afa43f83fecc",
+      "userId": "geetanshmalik337@gmail.com",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:39:38.959Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "c16c87f1-f3e7-446f-9a84-3659dfdb6d04",
+      "details": {
+        "reason": "Insufficient role clearance",
+        "userRole": "user",
+        "requiredRoles": [
+          "admin"
+        ]
+      }
+    },
+    {
+      "id": "audit-60cf2c10-9ffd-406b-a2aa-3af9c9f3da4a",
+      "userId": "geetanshmalik337@gmail.com",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T18:38:17.563Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "a9d0e17b-e2d8-4fd7-b012-0cd37b896619",
+      "details": {
+        "reason": "Insufficient role clearance",
+        "userRole": "user",
+        "requiredRoles": [
+          "admin"
+        ]
+      }
+    },
+    {
+      "id": "audit-95976c80-e6c9-4cdb-9043-7c8f1bd1f553",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:39:43.055Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "4993bc19-fcdc-48a0-9d5f-7fc20bfa57c1",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-cef2056b-f3fd-4739-be8b-919c0225da82",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:39:43.048Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "353fefa9-5cac-40cb-ae4f-793e70b6d226",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-76bff920-b9b6-4266-938e-d570d2e7f9ca",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T17:39:42.985Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "b8149b91-0623-42bc-8b8d-59369580251e",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-54d81adf-b6c0-4550-8242-ddd3648f870e",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:38:25.513Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "44c3ce42-5b1f-4bc3-a937-e1553f5a858e",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-89ff40c0-8562-40f3-b199-a69ebd4e05f5",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:35:19.795Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "9717e77c-7f70-474b-a65c-badd0bf2f2f5",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-004819d3-2c37-44a4-aa46-95e35056993c",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T17:35:19.755Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "d2518e41-d310-4695-98bc-4e801e2d67cc",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-05b8181c-408c-4c63-a67d-d725a211a7c5",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:35:01.832Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "3c06d942-d6c8-476e-88fe-c42b59fc988b",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-50bbc080-6648-4c78-8f94-a290a6eab216",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:34:49.794Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "25b1f2e2-55be-4e1c-8685-cf15a818cc62",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-517562b4-ab02-41ee-8d24-c45985d9ea1b",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:34:49.784Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "c80308f0-7fb9-4be0-92d2-b383e6a98105",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-48477482-aa15-445d-a9df-667bf354e1e3",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T17:34:49.720Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "265433ed-bca9-4658-9d62-263caf257553",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-bba387fe-6513-4b02-9d60-190d51b3bede",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/worker/logs",
+      "timestamp": "2026-06-27T17:34:46.215Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "23219812-a64c-4798-bfff-618bc9cef06b",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-0148ac36-5e11-427b-a5a0-c5438479fa64",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/notifications",
+      "timestamp": "2026-06-27T17:34:46.210Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "347eee84-fd5c-4b86-9c1e-5063fe8efcf8",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-a52806ba-08cd-4ad1-bc29-adde320711a9",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/tools/logs",
+      "timestamp": "2026-06-27T17:34:01.786Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "77dad7cd-38e9-4f0e-b5bc-e1d289417715",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-51582a73-0239-4dd2-a780-69bd3571921c",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/tools/registry",
+      "timestamp": "2026-06-27T17:34:01.781Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "955353a0-7f61-495a-ad28-fadc59ff3cd1",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-4d7655cf-779f-4d82-ab4a-8212095f75e9",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/governance/autonomy",
+      "timestamp": "2026-06-27T17:34:01.776Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "4a0a22d4-accb-46f1-bf00-8c7c30cb1b18",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-ec7cdea7-8d00-4811-809b-8aa196f51b96",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/learning/observations",
+      "timestamp": "2026-06-27T17:34:01.769Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "ac44dd1e-9441-46d1-bb1e-5e5145290292",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-61648a9e-b88d-458c-a1ed-b49cf4fe9614",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/tools/logs",
+      "timestamp": "2026-06-27T17:34:01.764Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "27a3bd0f-0f9e-44e9-a407-a427df7d031b",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-96689877-c936-45d8-b61a-591325e045f0",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/learning/observations",
+      "timestamp": "2026-06-27T17:34:01.748Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "189c4e95-f57a-4215-82c5-95077019b1c0",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-42824891-4d9d-4ac7-b27e-2ffee01d75db",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:33:55.789Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "73b4b758-597e-4434-b6b8-fc08380e1746",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-05f6c540-a14f-476e-a1e1-cb30c8615d65",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:33:55.779Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "7894db8e-a747-40b0-bdb7-0c777ac76766",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-8df40bf5-5647-40cc-abf4-d8376830c4cd",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T17:33:55.696Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "c06a3308-199b-4e3a-b72d-425e85235a6c",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-b621183e-9c04-43c1-8baa-ad0ec388c89f",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/goals",
+      "timestamp": "2026-06-27T17:25:00.103Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "0fc04a87-c65e-400f-85f5-9be311ed10f5",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    },
+    {
+      "id": "audit-81e6b250-ab80-4f05-90b3-e6ca5da6c483",
+      "userId": "anonymous",
+      "action": "UNAUTHORIZED_ACCESS",
+      "resource": "api/user/profile",
+      "timestamp": "2026-06-27T17:24:59.515Z",
+      "ipAddress": "127.0.0.1",
+      "correlationId": "4dce4de1-583c-4229-93ae-6180669fc7fe",
+      "details": {
+        "reason": "Invalid or expired token"
+      }
+    }
+  ],
+  "deadLetterEvents": [],
+  "processedEvents": [],
+  "eventStore": [
+    {
+      "id": "aa1d6fc5-04e0-496c-a64a-4f66b0e5ccbd",
+      "eventType": "GoalDeleted",
+      "timestamp": "2026-06-27T17:42:50.154Z",
+      "userId": "geetanshmalik337@gmail.com",
+      "correlationId": "ab6629f0-423b-4114-938f-a4e83b2db1ed",
+      "version": 1,
+      "payload": {
+        "type": "GoalDeleted",
+        "goalId": "g-c1mfhfasa",
+        "timestamp": "2026-06-27T17:42:50.154Z"
+      },
+      "metadata": {}
+    }
+  ],
+  "apiIdempotency": []
+}
