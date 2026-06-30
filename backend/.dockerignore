@@ -1,0 +1,10 @@
+node_modules
+dist
+frontend
+.env
+.env.local
+.git
+service-account-key.json
+*.bak
+*.log
+backend/src/db/db.json

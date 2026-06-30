@@ -21,6 +21,7 @@ import {
   Trophy,
   CheckCheck
 } from "lucide-react";
+import { API_URL } from "../api";
 
 interface GoalWorkspaceProps {
   goal: Goal;
@@ -81,7 +82,7 @@ export default function GoalWorkspace({
   const fetchResearch = async () => {
     setLoadingResearch(true);
     try {
-      const res = await fetch(`/api/goals/${goal.id}/research`);
+      const res = await fetch(`${API_URL}/api/goals/${goal.id}/research`);
       if (res.ok) {
         const pkgs = await res.json();
         if (pkgs && pkgs.length > 0) {
@@ -100,7 +101,7 @@ export default function GoalWorkspace({
   const handleTriggerResearch = async () => {
     setLoadingResearch(true);
     try {
-      const res = await fetch(`/api/goals/${goal.id}/research/trigger`, {
+      const res = await fetch(`${API_URL}/api/goals/${goal.id}/research/trigger`, {
         method: "POST"
       });
       if (res.ok) {
@@ -168,7 +169,7 @@ How can I optimize your execution plan today?`,
     setIsChatting(true);
 
     try {
-      const response = await fetch(`/api/goals/${goal.id}/chat`, {
+      const response = await fetch(`${API_URL}/api/goals/${goal.id}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: textToSend })

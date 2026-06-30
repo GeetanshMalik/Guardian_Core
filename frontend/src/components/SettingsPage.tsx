@@ -21,6 +21,7 @@ import {
   ThumbsUp,
   ThumbsDown
 } from "lucide-react";
+import { API_URL } from "../api";
 
 interface SettingsPageProps {
   onLogout: () => void | Promise<void>;
@@ -106,8 +107,8 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
     setLoadingTools(true);
     try {
       const [registryRes, logsRes] = await Promise.all([
-        fetch("/api/tools/registry"),
-        fetch("/api/tools/logs")
+        fetch(API_URL + "/api/tools/registry"),
+        fetch(API_URL + "/api/tools/logs")
       ]);
       if (registryRes.ok) {
         const registryData = await registryRes.json();
@@ -127,7 +128,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   const handleToggleTool = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
-      const res = await fetch(`/api/tools/registry/${id}`, {
+      const res = await fetch(`${API_URL}/api/tools/registry/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ availabilityStatus: newStatus })
@@ -144,7 +145,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
     if (!confirm("Are you sure you want to rollback/undo this action? This will undo the changes made in the target system.")) return;
     setRollingBackId(operationId);
     try {
-      const res = await fetch(`/api/tools/rollback/${operationId}`, {
+      const res = await fetch(`${API_URL}/api/tools/rollback/${operationId}`, {
         method: "POST"
       });
       if (res.ok) {
@@ -164,7 +165,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
 
   const fetchAutonomy = async () => {
     try {
-      const res = await fetch("/api/governance/autonomy");
+      const res = await fetch(API_URL + "/api/governance/autonomy");
       if (res.ok) {
         const data = await res.json();
         setAutonomyLevel(data.autonomyLevel);
@@ -176,7 +177,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
 
   const handleUpdateAutonomy = async (level: string) => {
     try {
-      const res = await fetch("/api/governance/autonomy", {
+      const res = await fetch(API_URL + "/api/governance/autonomy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ autonomyLevel: level })
@@ -192,7 +193,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   const fetchMemory = async () => {
     setLoadingMemories(true);
     try {
-      const res = await fetch("/api/memory");
+      const res = await fetch(API_URL + "/api/memory");
       if (res.ok) {
         const data = await res.json();
         setMemoryContext(data);
@@ -213,7 +214,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
 
   const fetchObservations = async () => {
     try {
-      const res = await fetch("/api/learning/observations");
+      const res = await fetch(API_URL + "/api/learning/observations");
       if (res.ok) {
         const data = await res.json();
         setObservations(data);
@@ -226,7 +227,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   const handleUpdatePref = async (id: string) => {
     setSavingPrefs(prev => ({ ...prev, [id]: true }));
     try {
-      const res = await fetch(`/api/memory/preferences/${id}`, {
+      const res = await fetch(`${API_URL}/api/memory/preferences/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ value: editingPrefs[id] })
@@ -243,7 +244,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
 
   const handleFeedback = async (id: string, feedback: "up" | "down") => {
     try {
-      const res = await fetch(`/api/memory/preferences/${id}/feedback`, {
+      const res = await fetch(`${API_URL}/api/memory/preferences/${id}/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ feedback })
@@ -260,7 +261,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   const handleDeleteMemory = async (layer: string, id: string) => {
     if (confirm(`Are you sure you want Guardian Core to forget this item from your ${layer} memory? This action is permanent.`)) {
       try {
-        const res = await fetch(`/api/memory/${layer}/${id}`, {
+        const res = await fetch(`${API_URL}/api/memory/${layer}/${id}`, {
           method: "DELETE"
         });
         if (res.ok) {
@@ -275,7 +276,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   const handleResetPersonalization = async () => {
     if (confirm("WARNING: This will completely erase all learned user preferences, historical decisions, completed episodes, and semantic facts. You will return to standard cognitive defaults. Proceed?")) {
       try {
-        const res = await fetch("/api/memory/reset", {
+        const res = await fetch(API_URL + "/api/memory/reset", {
           method: "POST"
         });
         if (res.ok) {
@@ -290,7 +291,7 @@ export default function SettingsPage({ onLogout, userProfile }: SettingsPageProp
   };
 
   const handleExportMemory = () => {
-    window.open("/api/memory/export", "_blank");
+    window.open(API_URL + "/api/memory/export", "_blank");
   };
 
   const toggleConnection = (key: keyof typeof connections) => {

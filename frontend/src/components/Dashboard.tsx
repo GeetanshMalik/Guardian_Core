@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Goal, Task } from "../types";
 import { Sparkles, Loader2, ArrowRight, Trash2, ShieldAlert, CheckCircle2, ChevronRight, HelpCircle, Target } from "lucide-react";
+import { API_URL } from "../api";
 
 interface DashboardProps {
   goals: Goal[];
@@ -54,7 +55,7 @@ export default function Dashboard({
     try {
       setLoadingStep("Guardian Core analyzing natural language...");
       // Hit our new parser endpoint
-      const parseResponse = await fetch("/api/goals/parse", {
+      const parseResponse = await fetch(API_URL + "/api/goals/parse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: commandInput })

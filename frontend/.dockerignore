@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.env.local
+.git
+service-account-key.json
+*.bak
+*.log

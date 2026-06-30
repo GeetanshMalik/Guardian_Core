@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import CalendarGrid from "./CalendarGrid";
+import { API_URL } from "../api";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -74,7 +75,7 @@ export default function CalendarPage({
   const fetchGoogleEvents = async () => {
     setLoadingEvents(true);
     try {
-      const res = await fetch("/api/calendar/events");
+      const res = await fetch(API_URL + "/api/calendar/events");
       if (res.ok) {
         const data = await res.json();
         setGoogleEvents(data);
@@ -93,7 +94,7 @@ export default function CalendarPage({
 
   const handleAddEvent = async (eventData: { title: string; description: string; date: string; startTime: string; endTime: string }) => {
     try {
-      const res = await fetch("/api/calendar/events", {
+      const res = await fetch(API_URL + "/api/calendar/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(eventData)
@@ -114,7 +115,7 @@ export default function CalendarPage({
   const handleDeleteEvent = async (eventId: string) => {
     if (!confirm("Are you sure you want to delete this Google Calendar event?")) return;
     try {
-      const res = await fetch(`/api/calendar/events/${eventId}`, {
+      const res = await fetch(`${API_URL}/api/calendar/events/${eventId}`, {
         method: "DELETE"
       });
       if (res.ok) {

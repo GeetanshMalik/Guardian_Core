@@ -7,6 +7,7 @@ import NotificationsPage from "./components/NotificationsPage";
 import SettingsPage from "./components/SettingsPage";
 import { Goal, Task } from "./types";
 import { Target, Search, Sparkles, Loader2, LogOut, ChevronDown } from "lucide-react";
+import { API_URL } from "./api";
 
 interface UserProfile {
   name: string;
@@ -27,7 +28,7 @@ export default function App() {
   // Fetch all goals
   const fetchGoals = async () => {
     try {
-      const response = await fetch("/api/goals");
+      const response = await fetch(API_URL + "/api/goals");
       if (response.ok) {
         const data = await response.json();
         setGoals(data);
@@ -45,7 +46,7 @@ export default function App() {
 
   const checkUserProfile = async () => {
     try {
-      const response = await fetch("/api/user/profile");
+      const response = await fetch(API_URL + "/api/user/profile");
       if (response.ok) {
         const data = await response.json();
         if (data.authenticated) {
@@ -79,7 +80,7 @@ export default function App() {
         sessionStorage.removeItem("cos_pending_goal");
         try {
           // Parse query first
-          const parseResponse = await fetch("/api/goals/parse", {
+          const parseResponse = await fetch(API_URL + "/api/goals/parse", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query: pendingGoal })
@@ -126,11 +127,11 @@ export default function App() {
     if (goalText.trim()) {
       sessionStorage.setItem("cos_pending_goal", goalText);
     }
-    window.location.href = "/auth/google";
+    window.location.href = API_URL + "/auth/google";
   };
 
   const handleCreateGoal = async (title: string, deadline: string, context: string) => {
-    const response = await fetch("/api/goals", {
+    const response = await fetch(API_URL + "/api/goals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, deadline, context }),
@@ -153,7 +154,7 @@ export default function App() {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/goals/${id}`, {
+      const response = await fetch(`${API_URL}/api/goals/${id}`, {
         method: "DELETE",
       });
 
@@ -176,7 +177,7 @@ export default function App() {
 
   const handleToggleGoalTask = async (goalId: string, taskId: string, isCompleted: boolean) => {
     try {
-      const response = await fetch(`/api/goals/${goalId}/tasks/${taskId}/complete`, {
+      const response = await fetch(`${API_URL}/api/goals/${goalId}/tasks/${taskId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isCompleted }),
@@ -197,7 +198,7 @@ export default function App() {
   const handleExecuteTask = async (taskId: string, userPrompt?: string) => {
     if (!selectedGoal) return;
 
-    const response = await fetch(`/api/goals/${selectedGoal.id}/tasks/${taskId}/execute`, {
+    const response = await fetch(`${API_URL}/api/goals/${selectedGoal.id}/tasks/${taskId}/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userPrompt }),
@@ -213,7 +214,7 @@ export default function App() {
   };
 
   const handleSyncCalendar = async (goalId: string, sessionIds: string[]) => {
-    const response = await fetch(`/api/goals/${goalId}/sync`, {
+    const response = await fetch(`${API_URL}/api/goals/${goalId}/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionIds }),
@@ -231,7 +232,7 @@ export default function App() {
   const handleTriggerRecovery = async () => {
     if (!selectedGoal) return;
 
-    const response = await fetch(`/api/goals/${selectedGoal.id}/apply-recovery`, {
+    const response = await fetch(`${API_URL}/api/goals/${selectedGoal.id}/apply-recovery`, {
       method: "POST",
     });
 
@@ -244,7 +245,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch(API_URL + "/api/auth/logout", { method: "POST" });
     } catch (err) {
       console.error("[Logout] Failed to clean up cookies:", err);
     }

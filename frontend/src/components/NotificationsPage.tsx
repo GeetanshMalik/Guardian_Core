@@ -13,6 +13,7 @@ import {
   Clock,
   Activity
 } from "lucide-react";
+import { API_URL } from "../api";
 
 interface NotificationsPageProps {
   goals: Goal[];
@@ -52,8 +53,8 @@ export default function NotificationsPage({
   const fetchAlertsAndLogs = async () => {
     try {
       const [notifsRes, jobsRes] = await Promise.all([
-        fetch("/api/notifications"),
-        fetch("/api/worker/logs")
+        fetch(API_URL + "/api/notifications"),
+        fetch(API_URL + "/api/worker/logs")
       ]);
 
       if (notifsRes.ok) {
@@ -82,7 +83,7 @@ export default function NotificationsPage({
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      const response = await fetch(`/api/notifications/${id}/read`, {
+      const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
         method: "POST"
       });
       if (response.ok) {
@@ -100,7 +101,7 @@ export default function NotificationsPage({
     if (!confirmed) return;
 
     try {
-      const response = await fetch("/api/notifications/clear", {
+      const response = await fetch(API_URL + "/api/notifications/clear", {
         method: "POST"
       });
       if (response.ok) {

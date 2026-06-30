@@ -46,13 +46,22 @@ router.get("/google", (req, res) => {
     res.redirect(authorizeUrl);
   } catch (err: any) {
     console.error("[OAuth] Error starting OAuth flow:", err);
-    res.redirect("/?error=auth_failed");
+    res.redirect(`${process.env.FRONTEND_URL || ""}/?error=auth_failed`);
   }
 });
 
 // 2. Google OAuth Redirect Callback Target
 router.get("/google/callback", async (req, res) => {
   const { code, mock } = req.query;
+  const isProd = process.env.NODE_ENV === "production";
+  const frontendUrl = process.env.FRONTEND_URL || "";
+
+  const getCookieOptions = (maxAge?: number) => ({
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" as const : "lax" as const,
+    ...(maxAge !== undefined ? { maxAge } : {})
+  });
 
   if (mock === "true" || !code) {
     console.log("[OAuth] Simulated profile sign-in triggered.");
@@ -78,29 +87,17 @@ router.get("/google/callback", async (req, res) => {
       google_access_token: encryptedAccess
     }, 24 * 3600); // 24 hours
 
-    res.cookie("user_session", jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    res.cookie("user_session", jwtToken, getCookieOptions());
 
     res.cookie("user_profile", JSON.stringify({
       email,
       name,
       picture,
       role
-    }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    }), getCookieOptions());
 
     // Downstream compatibility
-    res.cookie("google_access_token", "mock_access_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    res.cookie("google_access_token", "mock_access_token", getCookieOptions());
 
     container.auditService.log(
       "OAUTH_LOGIN",
@@ -110,7 +107,7 @@ router.get("/google/callback", async (req, res) => {
       email
     ).catch(err => console.error("Failed to save audit log:", err));
 
-    return res.redirect("/");
+    return res.redirect(`${frontendUrl}/`);
   }
 
   try {
@@ -149,37 +146,21 @@ router.get("/google/callback", async (req, res) => {
       google_refresh_token: encryptedRefresh
     }, tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3600);
 
-    res.cookie("user_session", jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: (tokens.expiry_date ? tokens.expiry_date - Date.now() : 3600) * 1000
-    });
+    const cookieMaxAge = tokens.expiry_date ? tokens.expiry_date - Date.now() : 3600 * 1000;
+
+    res.cookie("user_session", jwtToken, getCookieOptions(cookieMaxAge));
 
     res.cookie("user_profile", JSON.stringify({
       email,
       name,
       picture,
       role
-    }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    }), getCookieOptions());
 
-    res.cookie("google_access_token", tokens.access_token || "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: (tokens.expiry_date ? tokens.expiry_date - Date.now() : 3600) * 1000
-    });
+    res.cookie("google_access_token", tokens.access_token || "", getCookieOptions(cookieMaxAge));
 
     if (tokens.refresh_token) {
-      res.cookie("google_refresh_token", tokens.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax"
-      });
+      res.cookie("google_refresh_token", tokens.refresh_token, getCookieOptions());
     }
 
     container.auditService.log(
@@ -190,7 +171,7 @@ router.get("/google/callback", async (req, res) => {
       email
     ).catch(err => console.error("Failed to save audit log:", err));
 
-    res.redirect("/");
+    res.redirect(`${frontendUrl}/`);
   } catch (err: any) {
     console.error("[OAuth] Error during token exchange:", err);
     // Fallback to simulated login on failure to prevent total lockout in dev
@@ -213,10 +194,10 @@ router.get("/google/callback", async (req, res) => {
       google_access_token: encrypt("mock_access_token")
     }, 3600);
 
-    res.cookie("user_session", jwtToken, { httpOnly: true });
-    res.cookie("user_profile", JSON.stringify({ email, name, picture, role }), { httpOnly: true });
-    res.cookie("google_access_token", "mock_access_token", { httpOnly: true });
-    res.redirect("/");
+    res.cookie("user_session", jwtToken, getCookieOptions(3600 * 1000));
+    res.cookie("user_profile", JSON.stringify({ email, name, picture, role }), getCookieOptions());
+    res.cookie("google_access_token", "mock_access_token", getCookieOptions(3600 * 1000));
+    res.redirect(`${frontendUrl}/`);
   }
 });
 

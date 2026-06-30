@@ -83,8 +83,22 @@ async function startServer() {
   // ─── API Gateway Layer (§17.5) ──────────────────────────────────────────
 
   // CORS
+  const isProd = process.env.NODE_ENV === "production";
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim()) : [])
+  ].filter(Boolean);
+
   app.use(cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || !isProd) {
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+        return callback(null, true);
+      }
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
   }));
 

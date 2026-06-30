@@ -9,6 +9,7 @@ type LogLevel = "info" | "warn" | "error" | "debug";
 interface LogEntry {
   timestamp: string;
   level: LogLevel;
+  severity: string; // Map to GCP Cloud Logging severity levels
   message: string;
   requestId?: string;
   correlationId?: string;
@@ -24,6 +25,7 @@ function buildEntry(level: LogLevel, message: string, meta?: Record<string, unkn
   const entry: LogEntry = {
     timestamp: new Date().toISOString(),
     level,
+    severity: level.toUpperCase() === "WARN" ? "WARNING" : level.toUpperCase(),
     message,
   };
 

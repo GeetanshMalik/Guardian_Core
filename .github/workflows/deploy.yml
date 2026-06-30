@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   # ─── Quality Gates: Lint, Build, and Test ─────────────────────────────
@@ -19,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-size: 20
+          node-version: 20
           cache: 'npm'
 
       - name: Install Dependencies
@@ -38,7 +39,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: staging
 
@@ -53,7 +54,6 @@ jobs:
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          # Supports both Workload Identity Federation (recommended) and Service Account Keys
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Cloud SDK
@@ -65,51 +65,76 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Build and Push Docker Image
+      # 1. Build and Push Backend Image
+      - name: Build and Push Backend Image (Staging)
         run: |
-          IMAGE_TAG=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
-          docker build -t $IMAGE_TAG .
-          docker push $IMAGE_TAG
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          BACKEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/backend:staging-${{ github.sha }}
+          docker build -t $BACKEND_IMAGE -f backend/Dockerfile .
+          docker push $BACKEND_IMAGE
+          echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> $GITHUB_ENV
 
-      - name: Deploy API Service to Cloud Run (Staging)
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: guardian-core-api-staging
-          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
-          region: ${{ secrets.GCP_REGION }}
-          env_vars: |
-            NODE_ENV=production
-            DISABLE_WORKERS=true
-            ENABLE_SECRET_MANAGER=true
-            ENABLE_FIRESTORE=true
-            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Deploy Background Worker Service to Cloud Run (Staging)
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: guardian-core-worker-staging
-          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
-          region: ${{ secrets.GCP_REGION }}
-          env_vars: |
-            NODE_ENV=production
-            DISABLE_WORKERS=false
-            ENABLE_SECRET_MANAGER=true
-            ENABLE_FIRESTORE=true
-            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Run Smoke Tests
+      # 2. Deploy Backend Service (Staging)
+      - name: Deploy Backend Service (Staging)
         run: |
-          STAGING_URL=$(gcloud run services describe guardian-core-api-staging --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
-          echo "Staging API URL: $STAGING_URL"
-          curl -f -s "$STAGING_URL/health" || (echo "Staging health check failed!" && exit 1)
+          gcloud run deploy guardian-core-backend-staging \
+            --image=${{ env.BACKEND_IMAGE }} \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --max-instances=1 \
+            --min-instances=1 \
+            --no-cpu-throttling \
+            --set-env-vars="NODE_ENV=production,DISABLE_WORKERS=false,ENABLE_SECRET_MANAGER=true,ENABLE_FIRESTORE=true,GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ secrets.FIRESTORE_DATABASE_ID || 'deadline-guardian-ai' }}"
+
+      # 3. Retrieve Backend Service URL (Staging)
+      - name: Retrieve Backend URL (Staging)
+        run: |
+          BACKEND_URL=$(gcloud run services describe guardian-core-backend-staging --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+          echo "Staging Backend URL: $BACKEND_URL"
+
+      # 4. Build and Push Frontend Image (Staging)
+      - name: Build and Push Frontend Image (Staging)
+        run: |
+          FRONTEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/frontend:staging-${{ github.sha }}
+          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=${{ env.BACKEND_URL }} -f frontend/Dockerfile .
+          docker push $FRONTEND_IMAGE
+          echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> $GITHUB_ENV
+
+      # 5. Deploy Frontend Service (Staging)
+      - name: Deploy Frontend Service (Staging)
+        run: |
+          gcloud run deploy guardian-core-frontend-staging \
+            --image=${{ env.FRONTEND_IMAGE }} \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated
+
+      # 6. Retrieve Frontend Service URL (Staging)
+      - name: Retrieve Frontend URL (Staging)
+        run: |
+          FRONTEND_URL=$(gcloud run services describe guardian-core-frontend-staging --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
+          echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
+          echo "Staging Frontend URL: $FRONTEND_URL"
+
+      # 7. Update Backend with Frontend URL for CORS/Redirects (Staging)
+      - name: Update Backend CORS and Redirects (Staging)
+        run: |
+          gcloud run services update guardian-core-backend-staging \
+            --region=${{ secrets.GCP_REGION }} \
+            --update-env-vars="FRONTEND_URL=${{ env.FRONTEND_URL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}"
+
+      # 8. Run Smoke Tests (Staging)
+      - name: Run Smoke Tests (Staging)
+        run: |
+          curl -f -s "${{ env.BACKEND_URL }}/health" || (echo "Staging backend health check failed!" && exit 1)
+          curl -f -s "${{ env.FRONTEND_URL }}/" || (echo "Staging frontend load failed!" && exit 1)
 
   # ─── Deployment to Production Environment ─────────────────────────────
   deploy-production:
     name: Deploy to Production
     needs: deploy-staging
     runs-on: ubuntu-latest
-    # Requires manual environment approval gating in GitHub UI
     environment: production
 
     permissions:
@@ -130,30 +155,71 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Deploy API Service to Cloud Run (Production)
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: guardian-core-api-prod
-          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
-          region: ${{ secrets.GCP_REGION }}
-          # Zero-Downtime Blue-Green rollout config
-          no_traffic: false
-          env_vars: |
-            NODE_ENV=production
-            DISABLE_WORKERS=true
-            ENABLE_SECRET_MANAGER=true
-            ENABLE_FIRESTORE=true
-            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+      - name: Configure Docker for GCP Registry
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Deploy Worker Service to Cloud Run (Production)
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: guardian-core-worker-prod
-          image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/api:${{ github.sha }}
-          region: ${{ secrets.GCP_REGION }}
-          env_vars: |
-            NODE_ENV=production
-            DISABLE_WORKERS=false
-            ENABLE_SECRET_MANAGER=true
-            ENABLE_FIRESTORE=true
-            GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+      # 1. Build and Push Backend Image (Production)
+      - name: Build and Push Backend Image (Production)
+        run: |
+          BACKEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/backend:prod-${{ github.sha }}
+          docker build -t $BACKEND_IMAGE -f backend/Dockerfile .
+          docker push $BACKEND_IMAGE
+          echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> $GITHUB_ENV
+
+      # 2. Deploy Backend Service (Production)
+      - name: Deploy Backend Service (Production)
+        run: |
+          gcloud run deploy guardian-core-backend-prod \
+            --image=${{ env.BACKEND_IMAGE }} \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --max-instances=1 \
+            --min-instances=1 \
+            --no-cpu-throttling \
+            --set-env-vars="NODE_ENV=production,DISABLE_WORKERS=false,ENABLE_SECRET_MANAGER=true,ENABLE_FIRESTORE=true,GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ secrets.FIRESTORE_DATABASE_ID || 'deadline-guardian-ai' }}"
+
+      # 3. Retrieve Backend Service URL (Production)
+      - name: Retrieve Backend URL (Production)
+        run: |
+          BACKEND_URL=$(gcloud run services describe guardian-core-backend-prod --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+          echo "Production Backend URL: $BACKEND_URL"
+
+      # 4. Build and Push Frontend Image (Production)
+      - name: Build and Push Frontend Image (Production)
+        run: |
+          FRONTEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/frontend:prod-${{ github.sha }}
+          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=${{ env.BACKEND_URL }} -f frontend/Dockerfile .
+          docker push $FRONTEND_IMAGE
+          echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> $GITHUB_ENV
+
+      # 5. Deploy Frontend Service (Production)
+      - name: Deploy Frontend Service (Production)
+        run: |
+          gcloud run deploy guardian-core-frontend-prod \
+            --image=${{ env.FRONTEND_IMAGE }} \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated
+
+      # 6. Retrieve Frontend Service URL (Production)
+      - name: Retrieve Frontend URL (Production)
+        run: |
+          FRONTEND_URL=$(gcloud run services describe guardian-core-frontend-prod --region=${{ secrets.GCP_REGION }} --format='value(status.url)')
+          echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
+          echo "Production Frontend URL: $FRONTEND_URL"
+
+      # 7. Update Backend with Frontend URL for CORS/Redirects (Production)
+      - name: Update Backend CORS and Redirects (Production)
+        run: |
+          gcloud run services update guardian-core-backend-prod \
+            --region=${{ secrets.GCP_REGION }} \
+            --update-env-vars="FRONTEND_URL=${{ env.FRONTEND_URL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}"
+
+      # 8. Run Smoke Tests (Production)
+      - name: Run Smoke Tests (Production)
+        run: |
+          curl -f -s "${{ env.BACKEND_URL }}/health" || (echo "Production backend health check failed!" && exit 1)
+          curl -f -s "${{ env.FRONTEND_URL }}/" || (echo "Production frontend load failed!" && exit 1)

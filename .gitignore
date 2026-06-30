@@ -10,3 +10,4 @@ service-account-key.json
 backups/
 .vscode/
 .idea/
+backend/src/db/db.json

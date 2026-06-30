@@ -62,7 +62,7 @@ export const config = {
 
   /** Firestore / Persistence */
   firestore: {
-    projectId: env("GCLOUD_PROJECT"),
+    projectId: env("GOOGLE_CLOUD_PROJECT_ID") || env("GOOGLE_CLOUD_PROJECT") || env("GCLOUD_PROJECT") || env("GCP_PROJECT"),
     useEmulator: envBool("FIRESTORE_EMULATOR", false),
     emulatorHost: env("FIRESTORE_EMULATOR_HOST", "localhost:8080"),
   },

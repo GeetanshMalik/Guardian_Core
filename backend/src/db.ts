@@ -41,13 +41,34 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 10000): Promise
   ]);
 }
 
+// Helper to execute query with timeout and transient error retries
+async function runQuery<T>(fn: () => Promise<T>, timeoutMs: number = 1500, retries: number = 3): Promise<T> {
+  let lastErr: any;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await withTimeout(fn(), timeoutMs);
+    } catch (err: any) {
+      lastErr = err;
+      const isTransient = err.message?.includes("timed out") || err.code === 14 || err.code === 4 || err.code === 10;
+      if (!isTransient || attempt === retries) {
+        break;
+      }
+      const delay = 300 * Math.pow(2, attempt - 1);
+      console.warn(`[Firestore] Query failed (attempt ${attempt}/${retries}), retrying in ${delay}ms: ${err.message}`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw lastErr;
+}
+
+
 // Initialize Firestore lazily if credentials are provided
 function getFirestore(): Firestore | null {
   if (process.env.NODE_ENV === "test" || process.env.MOCK_GEMINI === "true") {
     return null;
   }
   if (firestore === null) {
-    const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT;
     const hasFirebaseConfig = fs.existsSync(path.join(process.cwd(), "firebase-applet-config.json"));
     const hasKeyFile = !!process.env.FIRESTORE_KEY_FILE && fs.existsSync(process.env.FIRESTORE_KEY_FILE);
     const isExplicitlyEnabled = process.env.ENABLE_FIRESTORE === "true";
@@ -69,6 +90,9 @@ function getFirestore(): Firestore | null {
       } catch (err) {
         console.error("Failed to initialize Firestore, falling back to local database:", err);
         firestore = null;
+        if (process.env.NODE_ENV === "production") {
+          throw err;
+        }
       }
     } else {
       if (projectId) {
@@ -251,10 +275,13 @@ export async function getGoals(): Promise<Goal[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("goals").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("goals").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Goal));
     } catch (err) {
       console.error("Firestore getGoals failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -265,13 +292,16 @@ export async function getGoalById(id: string): Promise<Goal | undefined> {
   const db = getFirestore();
   if (db) {
     try {
-      const doc = await withTimeout(db.collection("goals").doc(id).get(), 1500);
+      const doc = await runQuery(() => db.collection("goals").doc(id).get(), 1500);
       if (doc.exists) {
         return { id: doc.id, ...doc.data() } as Goal;
       }
       return undefined;
     } catch (err) {
       console.error(`Firestore getGoalById ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const goals = await getGoals();
@@ -282,10 +312,13 @@ export async function saveGoal(goal: Goal): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("goals").doc(goal.id).set(goal, { merge: true }), 1500);
+      await runQuery(() => db.collection("goals").doc(goal.id).set(goal, { merge: true }), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveGoal failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -308,29 +341,32 @@ export async function deleteGoal(id: string): Promise<void> {
       batch.delete(db.collection("goals").doc(id));
       
       // Query and delete related notifications
-      const notifsSnapshot = await withTimeout(db.collection("notifications").where("goalId", "==", id).get(), 1500);
+      const notifsSnapshot = await runQuery(() => db.collection("notifications").where("goalId", "==", id).get(), 1500);
       notifsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
       
       // Query and delete related jobs
-      const jobsSnapshot = await withTimeout(db.collection("jobs").where("goalId", "==", id).get(), 1500);
+      const jobsSnapshot = await runQuery(() => db.collection("jobs").where("goalId", "==", id).get(), 1500);
       jobsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
       
       // Query and delete related milestones
-      const milestonesSnapshot = await withTimeout(db.collection("milestones").where("goalId", "==", id).get(), 1500);
+      const milestonesSnapshot = await runQuery(() => db.collection("milestones").where("goalId", "==", id).get(), 1500);
       milestonesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
       
       // Query and delete related tasks
-      const tasksSnapshot = await withTimeout(db.collection("tasks").where("goalId", "==", id).get(), 1500);
+      const tasksSnapshot = await runQuery(() => db.collection("tasks").where("goalId", "==", id).get(), 1500);
       tasksSnapshot.docs.forEach(doc => batch.delete(doc.ref));
       
       // Query and delete related research packages
-      const researchSnapshot = await withTimeout(db.collection("researchPackages").where("goalId", "==", id).get(), 1500);
+      const researchSnapshot = await runQuery(() => db.collection("researchPackages").where("goalId", "==", id).get(), 1500);
       researchSnapshot.docs.forEach(doc => batch.delete(doc.ref));
       
-      await withTimeout(batch.commit(), 1500);
+      await runQuery(() => batch.commit(), 1500);
       return;
     } catch (err) {
       console.error("Firestore deleteGoal batch transaction failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -347,10 +383,13 @@ export async function getNotifications(): Promise<SystemNotification[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("notifications").orderBy("createdAt", "desc").limit(100).get(), 1500);
+      const snapshot = await runQuery(() => db.collection("notifications").orderBy("createdAt", "desc").limit(100).get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SystemNotification));
     } catch (err) {
       console.error("Firestore getNotifications failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -361,10 +400,13 @@ export async function saveNotification(notification: SystemNotification): Promis
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("notifications").doc(notification.id).set(notification), 1500);
+      await runQuery(() => db.collection("notifications").doc(notification.id).set(notification), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveNotification failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -379,10 +421,13 @@ export async function markNotificationAsRead(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("notifications").doc(id).update({ isRead: true }), 1500);
+      await runQuery(() => db.collection("notifications").doc(id).update({ isRead: true }), 1500);
       return;
     } catch (err) {
       console.error("Firestore markNotificationAsRead failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -397,13 +442,16 @@ export async function clearAllNotifications(): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("notifications").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("notifications").get(), 1500);
       const batch = db.batch();
       snapshot.docs.forEach(doc => batch.delete(doc.ref));
-      await withTimeout(batch.commit(), 1500);
+      await runQuery(() => batch.commit(), 1500);
       return;
     } catch (err) {
       console.error("Firestore clearAllNotifications failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -415,10 +463,13 @@ export async function getJobs(): Promise<AgentJob[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("jobs").orderBy("createdAt", "desc").limit(50).get(), 1500);
+      const snapshot = await runQuery(() => db.collection("jobs").orderBy("createdAt", "desc").limit(50).get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AgentJob));
     } catch (err) {
       console.error("Firestore getJobs failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -429,10 +480,13 @@ export async function saveJob(job: AgentJob): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("jobs").doc(job.id).set(job), 1500);
+      await runQuery(() => db.collection("jobs").doc(job.id).set(job), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveJob failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -449,10 +503,13 @@ export async function getEpisodicMemories(): Promise<EpisodicMemory[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("episodic_memories").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("episodic_memories").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as EpisodicMemory));
     } catch (err) {
       console.error("Firestore getEpisodicMemories failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -463,10 +520,13 @@ export async function saveEpisodicMemory(memory: EpisodicMemory): Promise<void> 
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("episodic_memories").doc(memory.id).set(memory), 1500);
+      await runQuery(() => db.collection("episodic_memories").doc(memory.id).set(memory), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveEpisodicMemory failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -484,10 +544,13 @@ export async function getSemanticMemories(): Promise<SemanticMemory[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("semantic_memories").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("semantic_memories").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SemanticMemory));
     } catch (err) {
       console.error("Firestore getSemanticMemories failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -498,10 +561,13 @@ export async function saveSemanticMemory(memory: SemanticMemory): Promise<void> 
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("semantic_memories").doc(memory.id).set(memory), 1500);
+      await runQuery(() => db.collection("semantic_memories").doc(memory.id).set(memory), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveSemanticMemory failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -519,10 +585,13 @@ export async function getPreferenceMemories(): Promise<PreferenceMemory[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("preference_memories").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("preference_memories").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PreferenceMemory));
     } catch (err) {
       console.error("Firestore getPreferenceMemories failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -533,10 +602,13 @@ export async function savePreferenceMemory(memory: PreferenceMemory): Promise<vo
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("preference_memories").doc(memory.id).set(memory), 1500);
+      await runQuery(() => db.collection("preference_memories").doc(memory.id).set(memory), 1500);
       return;
     } catch (err) {
       console.error("Firestore savePreferenceMemory failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -554,10 +626,13 @@ export async function getDecisionMemories(): Promise<DecisionMemory[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("decision_memories").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("decision_memories").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DecisionMemory));
     } catch (err) {
       console.error("Firestore getDecisionMemories failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -568,10 +643,13 @@ export async function saveDecisionMemory(memory: DecisionMemory): Promise<void> 
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("decision_memories").doc(memory.id).set(memory), 1500);
+      await runQuery(() => db.collection("decision_memories").doc(memory.id).set(memory), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveDecisionMemory failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -589,10 +667,13 @@ export async function getReflectionMemories(): Promise<ReflectionMemory[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("reflection_memories").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("reflection_memories").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ReflectionMemory));
     } catch (err) {
       console.error("Firestore getReflectionMemories failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -603,10 +684,13 @@ export async function saveReflectionMemory(memory: ReflectionMemory): Promise<vo
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("reflection_memories").doc(memory.id).set(memory), 1500);
+      await runQuery(() => db.collection("reflection_memories").doc(memory.id).set(memory), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveReflectionMemory failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -633,11 +717,14 @@ export async function deleteMemory(layer: string, id: string): Promise<void> {
       };
       const coll = collectionMap[layer];
       if (coll) {
-        await withTimeout(db.collection(coll).doc(id).delete(), 1500);
+        await runQuery(() => db.collection(coll).doc(id).delete(), 1500);
         return;
       }
     } catch (err) {
       console.error(`Firestore deleteMemory ${layer}/${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -662,13 +749,16 @@ export async function resetPersonalization(): Promise<void> {
       const batch = db.batch();
       const collections = ["episodic_memories", "semantic_memories", "preference_memories", "decision_memories", "reflection_memories", "observations"];
       for (const coll of collections) {
-        const snapshot = await withTimeout(db.collection(coll).get(), 1500);
+        const snapshot = await runQuery(() => db.collection(coll).get(), 1500);
         snapshot.docs.forEach(doc => batch.delete(doc.ref));
       }
-      await withTimeout(batch.commit(), 1500);
+      await runQuery(() => batch.commit(), 1500);
       return;
     } catch (err) {
       console.error("Firestore resetPersonalization failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -685,10 +775,13 @@ export async function getObservations(): Promise<Observation[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("observations").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("observations").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Observation));
     } catch (err) {
       console.error("Firestore getObservations failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -699,10 +792,13 @@ export async function saveObservation(observation: Observation): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("observations").doc(observation.id).set(observation), 1500);
+      await runQuery(() => db.collection("observations").doc(observation.id).set(observation), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveObservation failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -720,10 +816,13 @@ export async function deleteObservation(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("observations").doc(id).delete(), 1500);
+      await runQuery(() => db.collection("observations").doc(id).delete(), 1500);
       return;
     } catch (err) {
       console.error(`Firestore deleteObservation ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -735,12 +834,15 @@ export async function getAutonomyLevel(): Promise<AutonomyLevel> {
   const db = getFirestore();
   if (db) {
     try {
-      const doc = await withTimeout(db.collection("settings").doc("autonomy").get(), 1500);
+      const doc = await runQuery(() => db.collection("settings").doc("autonomy").get(), 1500);
       if (doc.exists) {
         return (doc.data()?.value || "assisted") as AutonomyLevel;
       }
     } catch (err) {
       console.error("Firestore getAutonomyLevel failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -751,10 +853,13 @@ export async function saveAutonomyLevel(level: AutonomyLevel): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("settings").doc("autonomy").set({ value: level }), 1500);
+      await runQuery(() => db.collection("settings").doc("autonomy").set({ value: level }), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveAutonomyLevel failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -766,12 +871,15 @@ export async function getToolRegistry(): Promise<ToolDefinition[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("toolRegistry").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("toolRegistry").get(), 1500);
       if (snapshot.size > 0) {
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ToolDefinition));
       }
     } catch (err) {
       console.error("Firestore getToolRegistry failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -782,10 +890,13 @@ export async function saveToolDefinition(tool: ToolDefinition): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("toolRegistry").doc(tool.id).set(tool), 1500);
+      await runQuery(() => db.collection("toolRegistry").doc(tool.id).set(tool), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveToolDefinition failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -803,10 +914,13 @@ export async function getToolExecutionLogs(): Promise<ToolExecutionLog[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("toolExecutionLogs").orderBy("timestamp", "desc").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("toolExecutionLogs").orderBy("timestamp", "desc").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ToolExecutionLog));
     } catch (err) {
       console.error("Firestore getToolExecutionLogs failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -817,10 +931,13 @@ export async function saveToolExecutionLog(log: ToolExecutionLog): Promise<void>
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("toolExecutionLogs").doc(log.id).set(log), 1500);
+      await runQuery(() => db.collection("toolExecutionLogs").doc(log.id).set(log), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveToolExecutionLog failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -838,12 +955,15 @@ export async function getToolExecutionLogById(id: string): Promise<ToolExecution
   const db = getFirestore();
   if (db) {
     try {
-      const doc = await withTimeout(db.collection("toolExecutionLogs").doc(id).get(), 1500);
+      const doc = await runQuery(() => db.collection("toolExecutionLogs").doc(id).get(), 1500);
       if (doc.exists) {
         return { id: doc.id, ...doc.data() } as ToolExecutionLog;
       }
     } catch (err) {
       console.error(`Firestore getToolExecutionLogById ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const logs = await getToolExecutionLogs();
@@ -854,10 +974,13 @@ export async function getResearchPackages(): Promise<ResearchPackage[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("researchPackages").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("researchPackages").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ResearchPackage));
     } catch (err) {
       console.error("Firestore getResearchPackages failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -873,10 +996,13 @@ export async function saveResearchPackage(pkg: ResearchPackage): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("researchPackages").doc(pkg.id).set(pkg), 1500);
+      await runQuery(() => db.collection("researchPackages").doc(pkg.id).set(pkg), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveResearchPackage failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -894,10 +1020,13 @@ export async function deleteResearchPackage(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("researchPackages").doc(id).delete(), 1500);
+      await runQuery(() => db.collection("researchPackages").doc(id).delete(), 1500);
       return;
     } catch (err) {
       console.error(`Firestore deleteResearchPackage ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -909,10 +1038,13 @@ export async function getMilestones(): Promise<Milestone[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("milestones").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("milestones").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Milestone));
     } catch (err) {
       console.error("Firestore getMilestones failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -928,10 +1060,13 @@ export async function saveMilestone(milestone: Milestone): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("milestones").doc(milestone.id).set(milestone), 1500);
+      await runQuery(() => db.collection("milestones").doc(milestone.id).set(milestone), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveMilestone failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -949,10 +1084,13 @@ export async function deleteMilestone(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("milestones").doc(id).delete(), 1500);
+      await runQuery(() => db.collection("milestones").doc(id).delete(), 1500);
       return;
     } catch (err) {
       console.error(`Firestore deleteMilestone ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -964,10 +1102,13 @@ export async function getTasks(): Promise<Task[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("tasks").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("tasks").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
     } catch (err) {
       console.error("Firestore getTasks failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -983,10 +1124,13 @@ export async function saveTask(task: Task): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("tasks").doc(task.id).set(task), 1500);
+      await runQuery(() => db.collection("tasks").doc(task.id).set(task), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveTask failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1004,10 +1148,13 @@ export async function deleteTask(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("tasks").doc(id).delete(), 1500);
+      await runQuery(() => db.collection("tasks").doc(id).delete(), 1500);
       return;
     } catch (err) {
       console.error(`Firestore deleteTask ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1019,10 +1166,13 @@ export async function getAuditLogs(): Promise<AuditLog[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("auditLogs").orderBy("timestamp", "desc").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("auditLogs").orderBy("timestamp", "desc").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AuditLog));
     } catch (err) {
       console.error("Firestore getAuditLogs failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1033,10 +1183,13 @@ export async function saveAuditLog(log: AuditLog): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("auditLogs").doc(log.id).set(log), 1500);
+      await runQuery(() => db.collection("auditLogs").doc(log.id).set(log), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveAuditLog failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1056,10 +1209,13 @@ export async function getDeadLetterEvents(): Promise<DeadLetterEvent[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("deadLetterEvents").orderBy("timestamp", "desc").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("deadLetterEvents").orderBy("timestamp", "desc").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DeadLetterEvent));
     } catch (err) {
       console.error("Firestore getDeadLetterEvents failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1070,10 +1226,13 @@ export async function saveDeadLetterEvent(event: DeadLetterEvent): Promise<void>
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("deadLetterEvents").doc(event.id).set(event), 1500);
+      await runQuery(() => db.collection("deadLetterEvents").doc(event.id).set(event), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveDeadLetterEvent failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1091,10 +1250,13 @@ export async function deleteDeadLetterEvent(id: string): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("deadLetterEvents").doc(id).delete(), 1500);
+      await runQuery(() => db.collection("deadLetterEvents").doc(id).delete(), 1500);
       return;
     } catch (err) {
       console.error(`Firestore deleteDeadLetterEvent ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1106,10 +1268,13 @@ export async function getProcessedEvents(): Promise<ProcessedEvent[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("processedEvents").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("processedEvents").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProcessedEvent));
     } catch (err) {
       console.error("Firestore getProcessedEvents failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1120,10 +1285,13 @@ export async function saveProcessedEvent(event: ProcessedEvent): Promise<void> {
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("processedEvents").doc(event.id).set(event), 1500);
+      await runQuery(() => db.collection("processedEvents").doc(event.id).set(event), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveProcessedEvent failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1141,10 +1309,13 @@ export async function getEventStore(): Promise<EventStoreEntry[]> {
   const db = getFirestore();
   if (db) {
     try {
-      const snapshot = await withTimeout(db.collection("eventStore").orderBy("timestamp", "asc").get(), 1500);
+      const snapshot = await runQuery(() => db.collection("eventStore").orderBy("timestamp", "asc").get(), 1500);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as EventStoreEntry));
     } catch (err) {
       console.error("Firestore getEventStore failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1155,12 +1326,15 @@ export async function getEventStoreEntryById(id: string): Promise<EventStoreEntr
   const db = getFirestore();
   if (db) {
     try {
-      const doc = await withTimeout(db.collection("eventStore").doc(id).get(), 1500);
+      const doc = await runQuery(() => db.collection("eventStore").doc(id).get(), 1500);
       if (doc.exists) {
         return { id: doc.id, ...doc.data() } as EventStoreEntry;
       }
     } catch (err) {
       console.error(`Firestore getEventStoreEntryById ${id} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const all = await getEventStore();
@@ -1171,10 +1345,13 @@ export async function saveEventStoreEntry(entry: EventStoreEntry): Promise<void>
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("eventStore").doc(entry.id).set(entry), 1500);
+      await runQuery(() => db.collection("eventStore").doc(entry.id).set(entry), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveEventStoreEntry failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1195,13 +1372,16 @@ export async function getIdempotencyEntry(key: string): Promise<IdempotencyEntry
   const db = getFirestore();
   if (db) {
     try {
-      const doc = await withTimeout(db.collection("apiIdempotency").doc(key).get(), 1500);
+      const doc = await runQuery(() => db.collection("apiIdempotency").doc(key).get(), 1500);
       if (doc.exists) {
         return doc.data() as IdempotencyEntry;
       }
       return undefined;
     } catch (err) {
       console.error(`Firestore getIdempotencyEntry ${key} failed, falling back:`, err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();
@@ -1212,10 +1392,13 @@ export async function saveIdempotencyEntry(entry: IdempotencyEntry): Promise<voi
   const db = getFirestore();
   if (db) {
     try {
-      await withTimeout(db.collection("apiIdempotency").doc(entry.id).set(entry), 1500);
+      await runQuery(() => db.collection("apiIdempotency").doc(entry.id).set(entry), 1500);
       return;
     } catch (err) {
       console.error("Firestore saveIdempotencyEntry failed, falling back:", err);
+      if (process.env.NODE_ENV === "production") {
+        throw err;
+      }
     }
   }
   const local = await readLocalDb();

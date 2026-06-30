@@ -37,10 +37,17 @@ router.get("/user/profile", (req: any, res) => {
 router.post("/auth/logout", async (req: any, res) => {
   const userEmail = req.user?.email || "unknown";
   
-  res.clearCookie("user_session");
-  res.clearCookie("google_access_token");
-  res.clearCookie("google_refresh_token");
-  res.clearCookie("user_profile");
+  const isProd = process.env.NODE_ENV === "production";
+  const cookieOpts = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" as const : "lax" as const
+  };
+
+  res.clearCookie("user_session", cookieOpts);
+  res.clearCookie("google_access_token", cookieOpts);
+  res.clearCookie("google_refresh_token", cookieOpts);
+  res.clearCookie("user_profile", cookieOpts);
 
   await container.auditService.log(
     "AUTH_LOGOUT",
