@@ -151,6 +151,62 @@ export default function LandingPage({ onStartWithGoal }: LandingPageProps) {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section id="how-it-works" className="bg-apple-canvas-parchment border-t border-apple-hairline py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-apple-ink font-display mb-4">
+              How It Works
+            </h2>
+            <p className="text-[16px] text-gray-500 max-w-xl mx-auto font-light">
+              Guardian Core acts as your autonomous Chief of Staff, handling the planning, scheduling, and tracking so you can focus on execution.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="bg-white border border-apple-hairline rounded-[20px] p-6 shadow-sm hover:shadow-md transition-all">
+              <div className="w-8 h-8 rounded-full bg-apple-blue text-white flex items-center justify-center text-[14px] font-semibold mb-4">
+                1
+              </div>
+              <h4 className="text-[16px] font-semibold text-apple-ink font-display mb-2">Set Your Goal</h4>
+              <p className="text-[13px] text-gray-500 leading-relaxed font-light">
+                Write your objective in plain natural language. The AI parses your intent, target dates, and key constraints.
+              </p>
+            </div>
+
+            <div className="bg-white border border-apple-hairline rounded-[20px] p-6 shadow-sm hover:shadow-md transition-all">
+              <div className="w-8 h-8 rounded-full bg-apple-blue text-white flex items-center justify-center text-[14px] font-semibold mb-4">
+                2
+              </div>
+              <h4 className="text-[16px] font-semibold text-apple-ink font-display mb-2">Auto-Decompose</h4>
+              <p className="text-[13px] text-gray-500 leading-relaxed font-light">
+                Our multi-agent system breaks down your goal into logical, chronological milestones and estimates task effort.
+              </p>
+            </div>
+
+            <div className="bg-white border border-apple-hairline rounded-[20px] p-6 shadow-sm hover:shadow-md transition-all">
+              <div className="w-8 h-8 rounded-full bg-apple-blue text-white flex items-center justify-center text-[14px] font-semibold mb-4">
+                3
+              </div>
+              <h4 className="text-[16px] font-semibold text-apple-ink font-display mb-2">Shield Your Calendar</h4>
+              <p className="text-[13px] text-gray-500 leading-relaxed font-light">
+                Guardian Core syncs with Google Calendar, finding optimal free blocks for deep work and avoiding meeting conflicts.
+              </p>
+            </div>
+
+            <div className="bg-white border border-apple-hairline rounded-[20px] p-6 shadow-sm hover:shadow-md transition-all">
+              <div className="w-8 h-8 rounded-full bg-apple-blue text-white flex items-center justify-center text-[14px] font-semibold mb-4">
+                4
+              </div>
+              <h4 className="text-[16px] font-semibold text-apple-ink font-display mb-2">Active Assistance</h4>
+              <p className="text-[13px] text-gray-500 leading-relaxed font-light">
+                The background engine monitors your progress, flags delays, and reschedules tasks automatically to protect your deadline.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-8 border-t border-apple-hairline text-center text-gray-400 text-[12px] font-light">
         <p>© 2026 Guardian Core AI Corporation. All rights reserved.</p>
