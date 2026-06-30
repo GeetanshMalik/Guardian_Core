@@ -94,7 +94,7 @@ jobs:
       - name: Deploy Backend Service (Staging)
         run: |
           gcloud run deploy guardian-core-backend-staging \
-            --image=${{ env.BACKEND_IMAGE }} \
+            --image=$BACKEND_IMAGE \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
@@ -114,7 +114,7 @@ jobs:
       - name: Build and Push Frontend Image (Staging)
         run: |
           FRONTEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/frontend:staging-${{ github.sha }}
-          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=${{ env.BACKEND_URL }} -f frontend/Dockerfile .
+          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=$BACKEND_URL -f frontend/Dockerfile .
           docker push $FRONTEND_IMAGE
           echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> $GITHUB_ENV
 
@@ -122,7 +122,7 @@ jobs:
       - name: Deploy Frontend Service (Staging)
         run: |
           gcloud run deploy guardian-core-frontend-staging \
-            --image=${{ env.FRONTEND_IMAGE }} \
+            --image=$FRONTEND_IMAGE \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated
@@ -139,13 +139,13 @@ jobs:
         run: |
           gcloud run services update guardian-core-backend-staging \
             --region=${{ secrets.GCP_REGION }} \
-            --update-env-vars="FRONTEND_URL=${{ env.FRONTEND_URL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}"
+            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL"
 
       # 8. Run Smoke Tests (Staging)
       - name: Run Smoke Tests (Staging)
         run: |
-          curl -f -s "${{ env.BACKEND_URL }}/health" || (echo "Staging backend health check failed!" && exit 1)
-          curl -f -s "${{ env.FRONTEND_URL }}/" || (echo "Staging frontend load failed!" && exit 1)
+          curl -f -s "$BACKEND_URL/health" || (echo "Staging backend health check failed!" && exit 1)
+          curl -f -s "$FRONTEND_URL/" || (echo "Staging frontend load failed!" && exit 1)
 
   # ─── Deployment to Production Environment ─────────────────────────────
   deploy-production:
@@ -205,7 +205,7 @@ jobs:
       - name: Deploy Backend Service (Production)
         run: |
           gcloud run deploy guardian-core-backend-prod \
-            --image=${{ env.BACKEND_IMAGE }} \
+            --image=$BACKEND_IMAGE \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
@@ -225,7 +225,7 @@ jobs:
       - name: Build and Push Frontend Image (Production)
         run: |
           FRONTEND_IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/guardian-core/frontend:prod-${{ github.sha }}
-          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=${{ env.BACKEND_URL }} -f frontend/Dockerfile .
+          docker build -t $FRONTEND_IMAGE --build-arg VITE_API_URL=$BACKEND_URL -f frontend/Dockerfile .
           docker push $FRONTEND_IMAGE
           echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> $GITHUB_ENV
 
@@ -233,7 +233,7 @@ jobs:
       - name: Deploy Frontend Service (Production)
         run: |
           gcloud run deploy guardian-core-frontend-prod \
-            --image=${{ env.FRONTEND_IMAGE }} \
+            --image=$FRONTEND_IMAGE \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated
@@ -250,10 +250,10 @@ jobs:
         run: |
           gcloud run services update guardian-core-backend-prod \
             --region=${{ secrets.GCP_REGION }} \
-            --update-env-vars="FRONTEND_URL=${{ env.FRONTEND_URL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}"
+            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL"
 
       # 8. Run Smoke Tests (Production)
       - name: Run Smoke Tests (Production)
         run: |
-          curl -f -s "${{ env.BACKEND_URL }}/health" || (echo "Production backend health check failed!" && exit 1)
-          curl -f -s "${{ env.FRONTEND_URL }}/" || (echo "Production frontend load failed!" && exit 1)
+          curl -f -s "$BACKEND_URL/health" || (echo "Production backend health check failed!" && exit 1)
+          curl -f -s "$FRONTEND_URL/" || (echo "Production frontend load failed!" && exit 1)
