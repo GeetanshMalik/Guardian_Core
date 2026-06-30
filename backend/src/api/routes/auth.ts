@@ -42,10 +42,22 @@ router.get("/google", (req, res) => {
       "https://www.googleapis.com/auth/calendar.events"
     ];
 
+    const referer = req.headers.referer;
+    let state = "";
+    if (referer) {
+      try {
+        const refUrl = new URL(referer);
+        state = `${refUrl.protocol}//${refUrl.host}`;
+      } catch (e) {
+        // Ignored
+      }
+    }
+
     const authorizeUrl = oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: scopes,
-      prompt: "consent"
+      prompt: "consent",
+      ...(state ? { state } : {})
     });
 
     res.redirect(authorizeUrl);
@@ -57,9 +69,11 @@ router.get("/google", (req, res) => {
 
 // 2. Google OAuth Redirect Callback Target
 router.get("/google/callback", async (req, res) => {
-  const { code, mock } = req.query;
+  const { code, mock, state } = req.query;
   const isProd = process.env.NODE_ENV === "production";
-  const frontendUrl = process.env.FRONTEND_URL || "";
+  const frontendUrl = (state && typeof state === "string" && state.startsWith("http"))
+    ? state
+    : (process.env.FRONTEND_URL || "");
 
   const getCookieOptions = (maxAge?: number) => ({
     httpOnly: true,

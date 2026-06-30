@@ -62,9 +62,9 @@ export class WorkerExecutionEngine {
     // Heartbeat tick runs every 15 seconds to check schedules
     this.heartbeatInterval = setInterval(() => this.tick(), 15000);
     
-    // Delay initial tick by 30 seconds to prevent startup burst of API calls in production
+    // Delay initial tick to prevent startup burst, but optimize for scale-to-zero in production
     const isTest = process.env.NODE_ENV === "test" || process.env.MOCK_GEMINI === "true";
-    const initialDelay = isTest ? 10 : 30000;
+    const initialDelay = isTest ? 10 : (process.env.WORKER_INITIAL_DELAY ? parseInt(process.env.WORKER_INITIAL_DELAY, 10) : 5000);
     setTimeout(() => this.tick(), initialDelay);
   }
 

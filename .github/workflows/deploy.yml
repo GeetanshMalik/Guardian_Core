@@ -39,7 +39,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     needs: test
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+    if: false # Disabled staging during judging to save costs
     runs-on: ubuntu-latest
     environment: staging
 
@@ -150,7 +150,7 @@ jobs:
   # ─── Deployment to Production Environment ─────────────────────────────
   deploy-production:
     name: Deploy to Production
-    needs: deploy-staging
+    needs: test
     runs-on: ubuntu-latest
     environment: production
 
@@ -210,9 +210,8 @@ jobs:
             --platform=managed \
             --allow-unauthenticated \
             --max-instances=1 \
-            --min-instances=1 \
-            --no-cpu-throttling \
-            --set-env-vars="NODE_ENV=production,DISABLE_WORKERS=false,ENABLE_SECRET_MANAGER=true,ENABLE_FIRESTORE=true,GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ secrets.FIRESTORE_DATABASE_ID || 'deadline-guardian-ai' }}"
+            --min-instances=0 \
+            --set-env-vars="NODE_ENV=production,DISABLE_WORKERS=false,ENABLE_SECRET_MANAGER=true,ENABLE_FIRESTORE=true,GOOGLE_CLOUD_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ secrets.FIRESTORE_DATABASE_ID || 'deadline-guardian-ai' }},WORKER_INITIAL_DELAY=2000"
 
       # 3. Retrieve Backend Service URL (Production)
       - name: Retrieve Backend URL (Production)
@@ -250,7 +249,8 @@ jobs:
         run: |
           gcloud run services update guardian-core-backend-prod \
             --region=${{ secrets.GCP_REGION }} \
-            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL,GOOGLE_CALLBACK_URL=$BACKEND_URL/auth/google/callback"
+            --min-instances=0 \
+            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL,GOOGLE_CALLBACK_URL=$BACKEND_URL/auth/google/callback,WORKER_INITIAL_DELAY=2000"
 
       # 8. Run Smoke Tests (Production)
       - name: Run Smoke Tests (Production)
