@@ -41,6 +41,13 @@ router.get("/health", async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   healthStatus.dependencies.oauth = (clientId && clientSecret) ? "CONFIGURED" : "MOCK_MODE";
+  healthStatus.debug = {
+    GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL || "undefined",
+    APP_URL: process.env.APP_URL || "undefined",
+    FRONTEND_URL: process.env.FRONTEND_URL || "undefined",
+    ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || "undefined",
+    NODE_ENV: process.env.NODE_ENV || "undefined"
+  };
 
   res.json(healthStatus);
 });
