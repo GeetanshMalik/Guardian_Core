@@ -27,7 +27,8 @@ router.get("/google", (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-    const callbackUrl = process.env.GOOGLE_CALLBACK_URL || `${process.env.APP_URL || "http://localhost:3000"}/auth/google/callback`;
+    // Resolve callback URL dynamically based on current request domain (foolproof routing)
+    const callbackUrl = `${req.protocol}://${req.get("host")}/auth/google/callback`;
 
     if (!clientId || !clientSecret) {
       console.warn("[OAuth] Google OAuth client credentials missing in env. Triggering simulated fallback login.");
@@ -129,7 +130,9 @@ router.get("/google/callback", async (req, res) => {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const callbackUrl = process.env.GOOGLE_CALLBACK_URL || `${process.env.APP_URL || "http://localhost:3000"}/auth/google/callback`;
+    
+    // Resolve callback URL dynamically based on current request domain (foolproof routing)
+    const callbackUrl = `${req.protocol}://${req.get("host")}/auth/google/callback`;
 
     const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, callbackUrl);
     const { tokens } = await oauth2Client.getToken(code as string);
