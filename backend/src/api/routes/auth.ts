@@ -87,14 +87,11 @@ router.get("/google/callback", async (req, res) => {
       google_access_token: encryptedAccess
     }, 24 * 3600); // 24 hours
 
+    const userPayload = { email, name, picture, role };
+
     res.cookie("user_session", jwtToken, getCookieOptions());
 
-    res.cookie("user_profile", JSON.stringify({
-      email,
-      name,
-      picture,
-      role
-    }), getCookieOptions());
+    res.cookie("user_profile", JSON.stringify(userPayload), getCookieOptions());
 
     // Downstream compatibility
     res.cookie("google_access_token", "mock_access_token", getCookieOptions());
@@ -107,7 +104,7 @@ router.get("/google/callback", async (req, res) => {
       email
     ).catch(err => console.error("Failed to save audit log:", err));
 
-    return res.redirect(`${frontendUrl}/`);
+    return res.redirect(`${frontendUrl}/?token=${jwtToken}&user=${encodeURIComponent(JSON.stringify(userPayload))}`);
   }
 
   try {
@@ -146,16 +143,12 @@ router.get("/google/callback", async (req, res) => {
       google_refresh_token: encryptedRefresh
     }, tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3600);
 
+    const userPayload = { email, name, picture, role };
     const cookieMaxAge = tokens.expiry_date ? tokens.expiry_date - Date.now() : 3600 * 1000;
 
     res.cookie("user_session", jwtToken, getCookieOptions(cookieMaxAge));
 
-    res.cookie("user_profile", JSON.stringify({
-      email,
-      name,
-      picture,
-      role
-    }), getCookieOptions());
+    res.cookie("user_profile", JSON.stringify(userPayload), getCookieOptions());
 
     res.cookie("google_access_token", tokens.access_token || "", getCookieOptions(cookieMaxAge));
 
@@ -171,7 +164,7 @@ router.get("/google/callback", async (req, res) => {
       email
     ).catch(err => console.error("Failed to save audit log:", err));
 
-    res.redirect(`${frontendUrl}/`);
+    res.redirect(`${frontendUrl}/?token=${jwtToken}&user=${encodeURIComponent(JSON.stringify(userPayload))}`);
   } catch (err: any) {
     console.error("[OAuth] Error during token exchange:", err);
     // Fallback to simulated login on failure to prevent total lockout in dev
@@ -194,10 +187,12 @@ router.get("/google/callback", async (req, res) => {
       google_access_token: encrypt("mock_access_token")
     }, 3600);
 
+    const userPayload = { email, name, picture, role };
+
     res.cookie("user_session", jwtToken, getCookieOptions(3600 * 1000));
-    res.cookie("user_profile", JSON.stringify({ email, name, picture, role }), getCookieOptions());
+    res.cookie("user_profile", JSON.stringify(userPayload), getCookieOptions());
     res.cookie("google_access_token", "mock_access_token", getCookieOptions(3600 * 1000));
-    res.redirect(`${frontendUrl}/`);
+    res.redirect(`${frontendUrl}/?token=${jwtToken}&user=${encodeURIComponent(JSON.stringify(userPayload))}`);
   }
 });
 

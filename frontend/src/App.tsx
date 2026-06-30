@@ -18,8 +18,17 @@ interface UserProfile {
 export default function App() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("cos_logged_in") === "true" && !!localStorage.getItem("cos_jwt_token");
+  });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem("cos_user_profile");
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [activePage, setActivePage] = useState<"dashboard" | "calendar" | "notifications" | "settings" | "workspace" >("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -59,11 +68,15 @@ export default function App() {
       setIsLoggedIn(false);
       setUserProfile(null);
       localStorage.removeItem("cos_logged_in");
+      localStorage.removeItem("cos_jwt_token");
+      localStorage.removeItem("cos_user_profile");
     } catch (err) {
       console.error("Failed to check user profile:", err);
       setIsLoggedIn(false);
       setUserProfile(null);
       localStorage.removeItem("cos_logged_in");
+      localStorage.removeItem("cos_jwt_token");
+      localStorage.removeItem("cos_user_profile");
     }
     return false;
   };
@@ -250,6 +263,8 @@ export default function App() {
       console.error("[Logout] Failed to clean up cookies:", err);
     }
     localStorage.removeItem("cos_logged_in");
+    localStorage.removeItem("cos_jwt_token");
+    localStorage.removeItem("cos_user_profile");
     setIsLoggedIn(false);
     setUserProfile(null);
     setSelectedGoal(null);
