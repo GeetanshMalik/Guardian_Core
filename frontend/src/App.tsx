@@ -84,38 +84,8 @@ export default function App() {
   useEffect(() => {
     const initApp = async () => {
       setLoading(true);
-      const isAuth = await checkUserProfile();
+      await checkUserProfile();
       await fetchGoals();
-
-      // If logged in and has a pending goal to auto-create, process it now!
-      const pendingGoal = sessionStorage.getItem("cos_pending_goal");
-      if (isAuth && pendingGoal) {
-        sessionStorage.removeItem("cos_pending_goal");
-        try {
-          // Parse query first
-          const parseResponse = await fetch(API_URL + "/api/goals/parse", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: pendingGoal })
-          });
-
-          let title = pendingGoal;
-          let deadline = "This Friday";
-          let context = "";
-
-          if (parseResponse.ok) {
-            const parsed = await parseResponse.json();
-            title = parsed.title || title;
-            deadline = parsed.deadline || deadline;
-            context = parsed.context || context;
-          }
-
-          // Create the goal
-          await handleCreateGoal(title, deadline, context);
-        } catch (err) {
-          console.error("Failed to auto-create pending goal:", err);
-        }
-      }
       setLoading(false);
     };
 
@@ -136,11 +106,12 @@ export default function App() {
     }
   }, []);
 
-  const handleStartWithGoal = async (goalText: string) => {
-    if (goalText.trim()) {
-      sessionStorage.setItem("cos_pending_goal", goalText);
-    }
+  const handleStartWithGoal = async (_goalText: string) => {
     window.location.href = API_URL + "/auth/google";
+  };
+
+  const handleDemoLogin = async () => {
+    window.location.href = API_URL + "/auth/google?mock=true";
   };
 
   const handleCreateGoal = async (title: string, deadline: string, context: string) => {
@@ -287,7 +258,7 @@ export default function App() {
 
   // If not logged in, show the pure landing experience
   if (!isLoggedIn) {
-    return <LandingPage onStartWithGoal={handleStartWithGoal} />;
+    return <LandingPage onStartWithGoal={handleStartWithGoal} onDemoLogin={handleDemoLogin} />;
   }
 
   return (

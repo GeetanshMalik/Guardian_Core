@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck, Target, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck, Target, Loader2, User } from "lucide-react";
 
 interface LandingPageProps {
   onStartWithGoal: (goalText: string) => Promise<void>;
+  onDemoLogin: () => Promise<void>;
 }
 
-export default function LandingPage({ onStartWithGoal }: LandingPageProps) {
+export default function LandingPage({ onStartWithGoal, onDemoLogin }: LandingPageProps) {
   const [goalInput, setGoalInput] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +25,23 @@ export default function LandingPage({ onStartWithGoal }: LandingPageProps) {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      await onStartWithGoal(goalInput || "Prepare for Google interview by July 1st");
+      await onStartWithGoal(goalInput || "");
     } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
+      setShowLoginModal(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    try {
+      await onDemoLogin();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDemoLoading(false);
       setShowLoginModal(false);
     }
   };
@@ -259,11 +273,33 @@ export default function LandingPage({ onStartWithGoal }: LandingPageProps) {
               )}
             </button>
 
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-gray-200"></div>
+              <span className="text-[12px] text-gray-400 font-medium">or</span>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            <button
+              id="auth-demo-btn"
+              onClick={handleDemoLogin}
+              disabled={isDemoLoading || isLoading}
+              className="w-full flex items-center justify-center gap-3 bg-gray-50 hover:bg-gray-100 border border-apple-hairline text-[15px] font-medium text-gray-600 py-3 px-4 rounded-full transition-all shadow-sm active:scale-98 cursor-pointer"
+            >
+              {isDemoLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
+              ) : (
+                <>
+                  <User className="w-5 h-5 text-gray-500" />
+                  <span>Try Demo Account</span>
+                </>
+              )}
+            </button>
+
             <button
               id="auth-cancel-btn"
               onClick={() => setShowLoginModal(false)}
               className="text-[13px] text-gray-400 hover:text-apple-ink mt-4 transition-colors font-medium cursor-pointer"
-              disabled={isLoading}
+              disabled={isLoading || isDemoLoading}
             >
               Cancel
             </button>

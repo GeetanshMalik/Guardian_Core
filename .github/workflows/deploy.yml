@@ -134,12 +134,12 @@ jobs:
           echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
           echo "Staging Frontend URL: $FRONTEND_URL"
 
-      # 7. Update Backend with Frontend URL for CORS/Redirects (Staging)
+      # 7. Update Backend with Frontend URL, CORS, and OAuth Callback (Staging)
       - name: Update Backend CORS and Redirects (Staging)
         run: |
           gcloud run services update guardian-core-backend-staging \
             --region=${{ secrets.GCP_REGION }} \
-            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL"
+            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL,GOOGLE_CALLBACK_URL=$BACKEND_URL/auth/google/callback"
 
       # 8. Run Smoke Tests (Staging)
       - name: Run Smoke Tests (Staging)
@@ -245,12 +245,12 @@ jobs:
           echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
           echo "Production Frontend URL: $FRONTEND_URL"
 
-      # 7. Update Backend with Frontend URL for CORS/Redirects (Production)
+      # 7. Update Backend with Frontend URL, CORS, and OAuth Callback (Production)
       - name: Update Backend CORS and Redirects (Production)
         run: |
           gcloud run services update guardian-core-backend-prod \
             --region=${{ secrets.GCP_REGION }} \
-            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL"
+            --update-env-vars="FRONTEND_URL=$FRONTEND_URL,ALLOWED_ORIGINS=$FRONTEND_URL,GOOGLE_CALLBACK_URL=$BACKEND_URL/auth/google/callback"
 
       # 8. Run Smoke Tests (Production)
       - name: Run Smoke Tests (Production)
