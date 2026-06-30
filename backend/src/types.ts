@@ -53,6 +53,7 @@ export interface RecoveryPlan {
 
 export interface Goal {
   id: string;
+  userId?: string;
   title: string;
   deadline: string;
   context: string;

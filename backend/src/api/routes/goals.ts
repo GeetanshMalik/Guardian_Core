@@ -32,10 +32,13 @@ async function autoSyncCalendarIfConnected(goal: any, accessToken?: string) {
   }
 }
 
-// 1. Get all goals
-router.get("/", async (req, res) => {
+// 1. Get all goals (scoped to authenticated user)
+router.get("/", async (req: any, res) => {
   try {
-    const goals = await goalService.getAll();
+    const userEmail = req.user?.email;
+    const allGoals = await goalService.getAll();
+    // Filter goals to only show the current user's goals (strict scoping)
+    const goals = userEmail ? allGoals.filter(g => g.userId === userEmail) : allGoals;
     res.json(goals);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -43,7 +46,7 @@ router.get("/", async (req, res) => {
 });
 
 // 2. Submit a goal → GuardianCore façade
-router.post("/", async (req, res) => {
+router.post("/", async (req: any, res) => {
   const { title, deadline, context } = req.body;
   if (!title || !deadline) {
     return res.status(400).json({ error: "Title and deadline are required" });
@@ -51,6 +54,11 @@ router.post("/", async (req, res) => {
 
   try {
     let newGoal = await guardianCore.createGoal(title, deadline, context);
+    // Stamp goal with the authenticated user's email
+    if (req.user?.email) {
+      newGoal.userId = req.user.email;
+      await goalRepository.save(newGoal);
+    }
     await autoSyncCalendarIfConnected(newGoal, req.cookies?.google_access_token);
     if (newGoal && newGoal.plan?.schedule?.some((s: any) => s.isSynced)) {
       const refreshed = await goalRepository.findById(newGoal.id);

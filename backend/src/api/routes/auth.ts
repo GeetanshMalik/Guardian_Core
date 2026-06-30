@@ -19,6 +19,11 @@ function getUserRole(email: string): "admin" | "user" {
 // 1. Kick-off Google Sign-In OAuth Consent Flow
 router.get("/google", (req, res) => {
   try {
+    // If mock=true is passed (demo login), skip OAuth entirely and go straight to mock callback
+    if (req.query.mock === "true") {
+      return res.redirect("/auth/google/callback?mock=true");
+    }
+
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
